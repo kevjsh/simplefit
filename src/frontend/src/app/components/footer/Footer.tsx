@@ -1,5 +1,4 @@
 import Image from "next/image";
-import styles from "./Footer.module.css";
 
 const CONTACT_ITEMS = [
   {
@@ -36,32 +35,37 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className={styles.footer}>
-      <div className={styles.main}>
-        {/* Brand */}
-        <div className={styles.brand}>
+    <footer className="bg-[#161d23] border-t border-[rgba(255,255,255,0.07)] mt-auto">
+      <div className="max-w-[1100px] mx-auto flex flex-col gap-7 px-5 pt-8 pb-6 md:flex-row md:gap-16 md:px-6 md:pt-6 md:pb-5 flex-wrap">
+        <div className="flex-[1_1_260px] flex flex-col gap-4">
           <Image
             src="https://firebasestorage.googleapis.com/v0/b/simplefit-6c181.firebasestorage.app/o/logos%2Fsimplefit.png?alt=media&token=64cccbb6-387b-4399-94d3-77b6c960ad34"
             alt="SimpleFit"
             width={140}
             height={70}
-            className={styles.brandLogo}
+            className="object-contain object-left brightness-0 invert !w-[120px] md:!w-[140px] !h-auto"
           />
-          <p className={styles.brandDesc}>
-          Un gimnasio completo, espacioso, donde podrás realizar tus rutinas de una manera más cómoda.
+          <p className="text-[0.88rem] text-[rgba(255,255,255,0.45)] leading-[1.65] md:max-w-[300px]">
+            Un gimnasio completo, espacioso, donde podrás realizar tus rutinas de una manera más cómoda.
           </p>
         </div>
 
-        {/* Contact */}
-        <div className={styles.contact}>
-          <h4 className={styles.colTitle}>Contacto</h4>
-          <ul className={styles.contactList}>
+        <div className="flex-[1_1_200px]">
+          <h4 className="text-[0.78rem] font-bold tracking-[0.1em] uppercase text-[rgba(255,255,255,0.9)] mb-[1.1rem]">
+            Contacto
+          </h4>
+          <ul className="flex flex-col gap-[0.85rem]">
             {CONTACT_ITEMS.map(({ icon, label, value, href }) => (
-              <li key={label} className={styles.contactItem}>
-                <span className={styles.contactIcon}>{icon}</span>
-                <span className={styles.contactText}>
+              <li key={label} className="flex items-start gap-[0.65rem]">
+                <span className="text-[rgba(255,255,255,0.4)] shrink-0 mt-px">{icon}</span>
+                <span className="text-[0.88rem] text-[rgba(255,255,255,0.6)] leading-normal">
                   {href ? (
-                    <a href={href} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[rgba(255,255,255,0.6)] transition-colors duration-150 hover:text-white"
+                    >
                       {value}
                     </a>
                   ) : (
@@ -74,9 +78,10 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div className={styles.bottom}>
-        <p>© {year} SimpleFit. Todos los derechos reservados.</p>
+      <div className="border-t border-[rgba(255,255,255,0.06)] px-5 py-[0.9rem] md:px-6 md:py-3 text-center">
+        <p className="text-[0.8rem] text-[rgba(255,255,255,0.3)]">
+          © {year} SimpleFit. Todos los derechos reservados.
+        </p>
       </div>
     </footer>
   );

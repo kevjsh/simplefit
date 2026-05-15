@@ -6,7 +6,7 @@ import { generateToken, generateRefreshToken } from "../helpers/jwtGenerator";
 import { logger } from "../helpers/logger.helper";
 import { cookieParams } from "../config/keys";
 import { CustomerCredentials } from "../models/customers/customer.credential.model";
-import { changePasswordMail, recoveryPasswordMail } from "../helpers/emails/user.email";
+import { changePasswordMail, recoveryPasswordMail } from "../helpers/emails/customer.email";
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body;

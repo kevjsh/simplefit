@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
-import styles from "./SelectInput.module.css";
 
 export interface SelectOption {
   value: string;
@@ -30,7 +29,6 @@ export default function SelectInput({
 
   const selected = options.find((o) => o.value === value) ?? null;
 
-  /* Close on outside click */
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
@@ -41,7 +39,6 @@ export default function SelectInput({
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  /* Close on Escape */
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -58,21 +55,44 @@ export default function SelectInput({
   };
 
   return (
-    <div ref={wrapRef} className={styles.wrap}>
-      {/* Trigger */}
+    <div ref={wrapRef} className="relative">
       <button
         id={id}
         type="button"
-        className={`${styles.trigger} ${hasError ? styles.error : ""} ${open ? styles.triggerOpen : ""}`}
+        className={[
+          "w-full h-[46px] flex items-center justify-between gap-2 pr-[0.85rem] pl-4",
+          "bg-[#111820] border rounded-[7px] cursor-pointer font-[inherit]",
+          "transition duration-150 outline-none",
+          hasError
+            ? "border-[rgba(255,100,100,0.55)]"
+            : open
+              ? "border-white/[0.28]"
+              : "border-white/[0.09]",
+          hasError
+            ? "focus-visible:shadow-[0_0_0_3px_rgba(255,100,100,0.08)]"
+            : "focus-visible:border-white/[0.28] focus-visible:shadow-[0_0_0_3px_rgba(255,255,255,0.05)]",
+          open && (hasError
+            ? "shadow-[0_0_0_3px_rgba(255,100,100,0.08)]"
+            : "shadow-[0_0_0_3px_rgba(255,255,255,0.05)]"),
+        ].filter(Boolean).join(" ")}
         onClick={toggle}
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span className={selected ? styles.triggerValue : styles.triggerPlaceholder}>
+        <span
+          className={
+            selected
+              ? "text-[0.92rem] text-white text-left whitespace-nowrap overflow-hidden text-ellipsis"
+              : "text-[0.92rem] text-white/20 text-left"
+          }
+        >
           {selected ? selected.label : placeholder}
         </span>
         <svg
-          className={`${styles.chevron} ${open ? styles.chevronOpen : ""}`}
+          className={[
+            "shrink-0 text-white/35 transition-[transform,color] duration-200 ease-in-out",
+            open && "rotate-180 text-white/70",
+          ].filter(Boolean).join(" ")}
           width="15" height="15" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" strokeWidth="2.5"
           strokeLinecap="round" strokeLinejoin="round"
@@ -81,15 +101,24 @@ export default function SelectInput({
         </svg>
       </button>
 
-      {/* Dropdown */}
       {open && (
-        <ul className={styles.dropdown} role="listbox">
+        <ul
+          className="absolute bottom-[calc(100%+5px)] left-0 right-0 z-[300] bg-[#1a2228] border border-white/10 rounded-lg shadow-[0_16px_40px_rgba(0,0,0,0.5)] p-[0.3rem] list-none animate-drop-in max-h-[220px] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.12)_transparent]"
+          role="listbox"
+        >
           {options.map((opt) => (
             <li
               key={opt.value}
               role="option"
               aria-selected={opt.value === value}
-              className={`${styles.option} ${opt.value === value ? styles.optionSelected : ""}`}
+              className={[
+                "flex items-center justify-between gap-2 py-[0.6rem] px-[0.85rem] rounded-[5px] text-[0.9rem]",
+                "cursor-pointer transition-[background,color] duration-[120ms] select-none",
+                "hover:bg-white/[0.07] hover:text-white",
+                opt.value === value
+                  ? "text-white font-semibold [&_svg]:text-white/60 [&_svg]:shrink-0"
+                  : "text-white/70",
+              ].join(" ")}
               onMouseDown={() => select(opt)}
             >
               {opt.label}

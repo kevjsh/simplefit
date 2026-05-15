@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Calendar from "./Calendar";
-import styles from "./DateInput.module.css";
 
 interface DateInputProps {
   id?: string;
@@ -70,12 +69,19 @@ export default function DateInput({ id, value, onChange, hasError }: DateInputPr
   const showError = hasError || inlineError;
 
   return (
-    <div className={styles.wrap}>
-      <div className={`${styles.inputWrap} ${showError ? styles.error : ""}`}>
+    <div className="flex flex-col gap-[0.4rem] relative">
+      <div
+        className={[
+          "relative flex items-center bg-[#111820] border rounded-[7px] transition duration-150",
+          showError
+            ? "border-[rgba(255,100,100,0.55)] focus-within:shadow-[0_0_0_3px_rgba(255,100,100,0.08)]"
+            : "border-white/[0.09] focus-within:border-white/[0.28] focus-within:shadow-[0_0_0_3px_rgba(255,255,255,0.05)]",
+        ].join(" ")}
+      >
         <input
           id={id}
           type="text"
-          className={styles.textInput}
+          className="flex-1 h-[46px] bg-transparent border-none outline-none text-white text-[0.92rem] font-[inherit] pr-2 pl-4 min-w-0 placeholder:text-white/20"
           value={text}
           onChange={handleTextChange}
           onBlur={handleBlur}
@@ -85,7 +91,15 @@ export default function DateInput({ id, value, onChange, hasError }: DateInputPr
         />
         <button
           type="button"
-          className={`${styles.calBtn} ${calOpen ? styles.calBtnActive : ""}`}
+          className={[
+            "shrink-0 w-10 h-10 flex items-center justify-center",
+            "border-l border-l-white/[0.07] cursor-pointer rounded-l-none rounded-r-[7px]",
+            "transition-[background,color] duration-150",
+            "hover:bg-white/[0.05] hover:text-white/80",
+            calOpen
+              ? "bg-white/[0.08] text-white/90"
+              : "text-white/35",
+          ].join(" ")}
           aria-label="Abrir calendario"
           onClick={() => setCalOpen((v) => !v)}
           tabIndex={-1}
@@ -108,9 +122,11 @@ export default function DateInput({ id, value, onChange, hasError }: DateInputPr
       )}
 
       {inlineError ? (
-        <span className={styles.dateError}>Fecha inválida — usa el formato dd-mm-yyyy</span>
+        <span className="text-[0.76rem] text-[rgba(255,110,110,0.9)]">
+          Fecha inválida — usa el formato dd-mm-yyyy
+        </span>
       ) : (
-        <span className={styles.hint}>Formato: dd-mm-yyyy</span>
+        <span className="text-[0.72rem] text-white/30">Formato: dd-mm-yyyy</span>
       )}
     </div>
   );

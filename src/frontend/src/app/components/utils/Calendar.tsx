@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
-import styles from "./Calendar.module.css";
 
 interface CalendarProps {
   value: string;           // yyyy-mm-dd or ""
@@ -24,6 +23,9 @@ function startOffset(y: number, m: number) {
   return (new Date(y, m, 1).getDay() + 6) % 7;
 }
 
+const NAV_BTN =
+  "size-[30px] flex items-center justify-center bg-transparent rounded-[5px] text-white/50 text-[1.1rem] cursor-pointer transition-[background,color] duration-[120ms] hover:bg-white/[0.08] hover:text-white";
+
 export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
   const today = new Date();
   const initDate = value ? new Date(value + "T00:00:00") : today;
@@ -33,7 +35,6 @@ export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
   const [mode, setMode] = useState<"days" | "months" | "years">("days");
   const ref = useRef<HTMLDivElement>(null);
 
-  /* Close on outside click */
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
@@ -72,18 +73,41 @@ export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
   const cells     = offset + totalDays;
   const rows      = Math.ceil(cells / 7);
 
-  /* Year range for year picker */
   const yearStart = Math.floor(viewYear / 12) * 12;
   const years = Array.from({ length: 12 }, (_, i) => yearStart + i);
 
-  return (
-    <div ref={ref} className={styles.calendar}>
+  const dayClasses = (day: number, valid: boolean) => {
+    const sel = valid && isSelected(day);
+    const tod = valid && isToday(day);
+    return [
+      "aspect-square flex items-center justify-center rounded-full text-[0.82rem] font-[inherit]",
+      "transition-[background,color] duration-[120ms]",
+      !valid && "cursor-default text-transparent",
+      valid && !sel && "cursor-pointer text-white/75 hover:bg-white/[0.09] hover:text-white",
+      tod && !sel && "text-white font-bold border-[1.5px] border-white/35",
+      sel && "cursor-pointer bg-white text-[#1a2228] font-bold",
+    ].filter(Boolean).join(" ");
+  };
 
+  const pickerBtnClasses = (isActive: boolean) =>
+    [
+      "py-[0.55rem] px-0 bg-transparent rounded-[6px] text-[0.83rem] font-[inherit]",
+      "cursor-pointer transition-[background,color] duration-[120ms]",
+      isActive
+        ? "bg-white text-[#1a2228] font-bold"
+        : "text-white/65 hover:bg-white/[0.08] hover:text-white",
+    ].join(" ");
+
+  return (
+    <div
+      ref={ref}
+      className="absolute bottom-[calc(100%+6px)] left-0 z-[300] w-[280px] bg-[#1a2228] border border-white/10 rounded-[10px] shadow-[0_16px_48px_rgba(0,0,0,0.55)] p-3 animate-cal-in"
+    >
       {/* ── Header ──────────────────────────────────────── */}
-      <div className={styles.header}>
+      <div className="flex items-center justify-between mb-[0.65rem]">
         <button
           type="button"
-          className={styles.headerLabel}
+          className="flex items-center gap-[0.35rem] bg-transparent text-white text-[0.9rem] font-semibold font-[inherit] cursor-pointer py-[0.3rem] px-2 rounded-[5px] transition-[background] duration-[120ms] hover:bg-white/[0.07] capitalize [&_svg]:text-white/45 [&_svg]:shrink-0"
           onClick={() => setMode(mode === "days" ? "months" : "days")}
         >
           {MONTHS[viewMonth]} {viewYear}
@@ -91,16 +115,16 @@ export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
             <polyline points="6 9 12 15 18 9"/>
           </svg>
         </button>
-        <div className={styles.navBtns}>
+        <div className="flex gap-0.5">
           {mode === "years" ? (
             <>
-              <button type="button" className={styles.navBtn} onClick={() => setViewYear((y) => y - 12)}>‹</button>
-              <button type="button" className={styles.navBtn} onClick={() => setViewYear((y) => y + 12)}>›</button>
+              <button type="button" className={NAV_BTN} onClick={() => setViewYear((y) => y - 12)}>‹</button>
+              <button type="button" className={NAV_BTN} onClick={() => setViewYear((y) => y + 12)}>›</button>
             </>
           ) : (
             <>
-              <button type="button" className={styles.navBtn} onClick={prevMonth}>‹</button>
-              <button type="button" className={styles.navBtn} onClick={nextMonth}>›</button>
+              <button type="button" className={NAV_BTN} onClick={prevMonth}>‹</button>
+              <button type="button" className={NAV_BTN} onClick={nextMonth}>›</button>
             </>
           )}
         </div>
@@ -109,10 +133,14 @@ export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
       {/* ── Day grid ────────────────────────────────────── */}
       {mode === "days" && (
         <>
-          <div className={styles.weekRow}>
-            {DAYS.map((d, i) => <span key={i} className={styles.weekDay}>{d}</span>)}
+          <div className="grid grid-cols-7 mb-[0.3rem]">
+            {DAYS.map((d, i) => (
+              <span key={i} className="text-center text-[0.72rem] font-semibold text-white/30 py-[0.2rem] uppercase">
+                {d}
+              </span>
+            ))}
           </div>
-          <div className={styles.dayGrid}>
+          <div className="grid grid-cols-7 gap-0.5">
             {Array.from({ length: rows * 7 }, (_, i) => {
               const day = i - offset + 1;
               const valid = day >= 1 && day <= totalDays;
@@ -122,7 +150,7 @@ export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
                   type="button"
                   disabled={!valid}
                   onClick={() => valid && selectDay(day)}
-                  className={`${styles.day} ${!valid ? styles.dayEmpty : ""} ${valid && isToday(day) ? styles.dayToday : ""} ${valid && isSelected(day) ? styles.daySelected : ""}`}
+                  className={dayClasses(day, valid)}
                 >
                   {valid ? day : ""}
                 </button>
@@ -134,12 +162,12 @@ export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
 
       {/* ── Month picker ────────────────────────────────── */}
       {mode === "months" && (
-        <div className={styles.monthGrid}>
+        <div className="grid grid-cols-3 gap-1 py-1">
           {MONTHS.map((m, i) => (
             <button
               key={i}
               type="button"
-              className={`${styles.monthBtn} ${i === viewMonth ? styles.monthSelected : ""}`}
+              className={`${pickerBtnClasses(i === viewMonth)} capitalize`}
               onClick={() => { setViewMonth(i); setMode("days"); }}
             >
               {m.slice(0, 3)}
@@ -150,12 +178,12 @@ export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
 
       {/* ── Year picker ─────────────────────────────────── */}
       {mode === "years" && (
-        <div className={styles.yearGrid}>
+        <div className="grid grid-cols-3 gap-1 py-1">
           {years.map((y) => (
             <button
               key={y}
               type="button"
-              className={`${styles.yearBtn} ${y === viewYear ? styles.yearSelected : ""}`}
+              className={pickerBtnClasses(y === viewYear)}
               onClick={() => { setViewYear(y); setMode("months"); }}
             >
               {y}
@@ -165,10 +193,10 @@ export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
       )}
 
       {/* Footer shortcut */}
-      <div className={styles.footer}>
+      <div className="flex justify-end border-t border-t-white/[0.07] pt-2 mt-2">
         <button
           type="button"
-          className={styles.todayBtn}
+          className="bg-transparent text-[0.78rem] font-[inherit] text-white/45 cursor-pointer py-[0.2rem] px-[0.4rem] rounded transition-[color,background] duration-[120ms] hover:text-white hover:bg-white/[0.06]"
           onClick={() => {
             setViewYear(today.getFullYear());
             setViewMonth(today.getMonth());
@@ -178,7 +206,6 @@ export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
           Hoy
         </button>
       </div>
-
     </div>
   );
 }

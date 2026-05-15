@@ -8,7 +8,6 @@ import LoginModal from "../login/LoginModal";
 import DateInput from "../../utils/DateInput";
 import SelectInput from "../../utils/SelectInput";
 import TermsModal from "./TermsModal";
-import styles from "./SignupPage.module.css";
 import { signupCustomer } from "../../../../services/auth.service";
 import { useNotifications } from "../../utils/NotificationSystem";
 
@@ -62,6 +61,14 @@ function parseName(raw: string): { firstName: string; firstLastName: string; sec
   }
   return { firstName: words.join(" "), firstLastName: "", secondLastName: "" };
 }
+
+/* ── Shared Tailwind class strings ────────────────────── */
+const inputBase = "w-full h-[46px] bg-[#111820] border border-white/9 rounded-[7px] text-white text-[0.92rem] font-[inherit] px-4 outline-none transition-[border-color,background,box-shadow] duration-150 placeholder:text-white/20 focus:bg-[#0e1520] focus:border-white/[0.28] focus:shadow-[0_0_0_3px_rgba(255,255,255,0.05)]";
+const inputErrorCls = "!border-[rgba(255,100,100,0.55)] focus:!shadow-[0_0_0_3px_rgba(255,100,100,0.08)]";
+const labelCls = "text-[0.78rem] font-semibold text-white/60 tracking-[0.03em]";
+const requiredCls = "text-white/30 ml-0.5";
+const fieldCls = "flex flex-col gap-[0.4rem]";
+const errorMsgCls = "text-[0.76rem] text-[rgba(255,110,110,0.9)]";
 
 /* ── Component ─────────────────────────────────────────── */
 export default function SignupPage() {
@@ -231,11 +238,11 @@ export default function SignupPage() {
   /* ── Field helper ─────────────────────────────────────── */
   const err = (field: FieldKey, msg = "Este campo es requerido") =>
     touched && isEmpty(String(form[field])) ? (
-      <span className={styles.errorMsg}>{msg}</span>
+      <span className={errorMsgCls}>{msg}</span>
     ) : null;
 
   const inputClass = (field: FieldKey) =>
-    `${styles.input} ${touched && isEmpty(String(form[field])) ? styles.inputError : ""}`;
+    `${inputBase} ${touched && isEmpty(String(form[field])) ? inputErrorCls : ""}`;
 
   return (
     <>
@@ -243,25 +250,25 @@ export default function SignupPage() {
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
       <TermsModal open={termsOpen} onClose={() => setTermsOpen(false)} />
 
-      <main className={styles.main}>
-        <div className={styles.container}>
+      <main className="flex-1 flex justify-center pt-[calc(var(--spacing-nav-h)+2.5rem)] px-4 pb-12 max-[560px]:pt-[calc(var(--spacing-nav-h)+1.5rem)] max-[560px]:px-3 max-[560px]:pb-10">
+        <div className="w-full max-w-[680px] flex flex-col gap-8">
 
           {/* ── Page header ─────────────────────────────── */}
-          <div className={styles.pageHeader}>
-            <h1 className={styles.pageTitle}>Crear cuenta</h1>
-            <p className={styles.pageSubtitle}>
+          <div className="flex flex-col gap-[0.35rem]">
+            <h1 className="text-[clamp(1.75rem,4vw,2.4rem)] font-extrabold text-white tracking-[-0.02em] leading-[1.1]">Crear cuenta</h1>
+            <p className="text-[0.95rem] text-white/50">
               Completa los pasos para registrarte en SimpleFit
             </p>
           </div>
 
           {/* ── Stepper indicator ───────────────────────── */}
-          <div className={styles.stepper}>
+          <div className="flex flex-col gap-[0.6rem]">
             {/* Top row: circles + lines */}
-            <div className={styles.stepTrack}>
+            <div className="flex items-center">
               {STEPS.map((s, i) => (
                 <React.Fragment key={i}>
                   <div
-                    className={`${styles.stepCircle} ${i < step ? styles.stepDone : i === step ? styles.stepActive : ""}`}
+                    className={`shrink-0 w-8 h-8 rounded-full border-2 border-white/[0.18] bg-[#1a2228] text-white/30 flex items-center justify-center text-[0.8rem] font-bold transition-all duration-[250ms] relative z-[1] max-[560px]:w-7 max-[560px]:h-7 max-[560px]:text-[0.75rem] ${i < step ? "!border-white/60 !bg-white/12 !text-white" : i === step ? "!border-white !bg-white !text-[#1e272e]" : ""}`}
                   >
                     {i < step ? (
                       <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -272,15 +279,15 @@ export default function SignupPage() {
                     )}
                   </div>
                   {i < STEPS.length - 1 && (
-                    <div className={`${styles.line} ${i < step ? styles.lineActive : ""}`} />
+                    <div className={`flex-1 h-0.5 bg-white/12 transition-[background] duration-300 ${i < step ? "!bg-white/70" : ""}`} />
                   )}
                 </React.Fragment>
               ))}
             </div>
             {/* Bottom row: labels aligned under each circle */}
-            <div className={styles.stepLabels}>
+            <div className="grid grid-cols-4 max-[560px]:hidden">
               {STEPS.map((s, i) => (
-                <span key={i} className={`${styles.stepLabel} ${i === step ? styles.stepLabelActive : ""}`}>
+                <span key={i} className={`text-[0.72rem] text-white/30 text-center transition-colors duration-[250ms] leading-[1.3] ${i === step ? "!text-white/85 font-semibold" : ""}`}>
                   {s.label}
                 </span>
               ))}
@@ -288,57 +295,57 @@ export default function SignupPage() {
           </div>
 
           {/* ── Form card ───────────────────────────────── */}
-          <div className={styles.card} onKeyDown={handleKeyDown}>
+          <div className="bg-[#1a2228] border border-white/8 rounded-xl p-8 flex flex-col gap-8 shadow-[0_8px_40px_rgba(0,0,0,0.35)] max-[560px]:p-[1.5rem_1.1rem]" onKeyDown={handleKeyDown}>
 
             {/* Step 0 — Identificación */}
             {step === 0 && (
-              <div className={styles.stepContent}>
-                <div className={styles.stepHeader}>
-                  <p className={styles.stepNumber}>Paso 1 de 4</p>
-                  <h2 className={styles.stepTitle}>Número de identificación</h2>
-                  <p className={styles.stepDesc}>Selecciona el tipo de documento e ingresa tu número.</p>
+              <div className="flex flex-col gap-7">
+                <div className="flex flex-col gap-[0.3rem]">
+                  <p className="text-[0.75rem] font-semibold text-white/35 uppercase tracking-[0.08em]">Paso 1 de 4</p>
+                  <h2 className="text-[1.25rem] font-bold text-white tracking-[-0.01em]">Número de identificación</h2>
+                  <p className="text-[0.88rem] text-white/45">Selecciona el tipo de documento e ingresa tu número.</p>
                 </div>
-                <div className={styles.fields}>
+                <div className="flex flex-col gap-[1.1rem]">
 
                   {/* Radio — tipo de documento */}
-                  <div className={styles.radioGroup}>
-                    <label className={styles.radioLabel}>
+                  <div className="flex gap-6 flex-wrap">
+                    <label className="flex items-center gap-[0.55rem] cursor-pointer select-none text-[0.92rem] text-white/70">
                       <input
                         type="radio"
                         name="idType"
                         value="nacional"
                         checked={form.idType === "nacional"}
                         onChange={() => setForm((p) => ({ ...p, idType: "nacional", personId: "" }))}
-                        className={styles.radioInput}
+                        className="hidden"
                       />
-                      <span className={`${styles.radioCustom} ${form.idType === "nacional" ? styles.radioChecked : ""}`} />
-                      <span className={styles.radioText}>Nacional</span>
+                      <span className={`w-[18px] h-[18px] shrink-0 rounded-full border-2 border-white/[0.22] bg-[#111820] transition-[border-color,background] duration-150 flex items-center justify-center after:content-[''] after:w-2 after:h-2 after:rounded-full after:bg-transparent after:transition-[background] after:duration-150 ${form.idType === "nacional" ? "!border-white after:!bg-white" : ""}`} />
+                      <span className={`transition-colors duration-150 ${form.idType === "nacional" ? "text-white" : ""}`}>Nacional</span>
                     </label>
-                    <label className={styles.radioLabel}>
+                    <label className="flex items-center gap-[0.55rem] cursor-pointer select-none text-[0.92rem] text-white/70">
                       <input
                         type="radio"
                         name="idType"
                         value="otro"
                         checked={form.idType === "otro"}
                         onChange={() => setForm((p) => ({ ...p, idType: "otro", personId: "" }))}
-                        className={styles.radioInput}
+                        className="hidden"
                       />
-                      <span className={`${styles.radioCustom} ${form.idType === "otro" ? styles.radioChecked : ""}`} />
-                      <span className={styles.radioText}>Otro</span>
+                      <span className={`w-[18px] h-[18px] shrink-0 rounded-full border-2 border-white/[0.22] bg-[#111820] transition-[border-color,background] duration-150 flex items-center justify-center after:content-[''] after:w-2 after:h-2 after:rounded-full after:bg-transparent after:transition-[background] after:duration-150 ${form.idType === "otro" ? "!border-white after:!bg-white" : ""}`} />
+                      <span className={`transition-colors duration-150 ${form.idType === "otro" ? "text-white" : ""}`}>Otro</span>
                     </label>
                   </div>
 
                   {/* Input de identificación */}
-                  <div className={styles.field}>
-                    <label className={styles.label} htmlFor="sf-personId">
+                  <div className={fieldCls}>
+                    <label className={labelCls} htmlFor="sf-personId">
                       {form.idType === "nacional" ? "Cédula nacional" : "Número de documento"}{" "}
-                      <span className={styles.required}>*</span>
+                      <span className={requiredCls}>*</span>
                     </label>
                     <input
                       id="sf-personId"
                       type="text"
                       inputMode="numeric"
-                      className={`${styles.input} ${touched && idError ? styles.inputError : ""}`}
+                      className={`${inputBase} ${touched && idError ? inputErrorCls : ""}`}
                       placeholder={form.idType === "nacional" ? "123456789" : "Pasaporte, DIMEX, etc."}
                       value={form.personId}
                       maxLength={form.idType === "nacional" ? 9 : 30}
@@ -352,12 +359,12 @@ export default function SignupPage() {
                       autoComplete="off"
                     />
                     {form.idType === "nacional" && (
-                      <span className={styles.hint}>
+                      <span className="text-[0.76rem] text-white/[0.38] leading-[1.4]">
                         Incluye todos los ceros — son exactamente 9 dígitos sin guiones ni espacios
                       </span>
                     )}
                     {touched && idError && (
-                      <span className={styles.errorMsg}>{idError}</span>
+                      <span className={errorMsgCls}>{idError}</span>
                     )}
                   </div>
 
@@ -367,16 +374,16 @@ export default function SignupPage() {
 
             {/* Step 1 — Datos personales */}
             {step === 1 && (
-              <div className={styles.stepContent}>
-                <div className={styles.stepHeader}>
-                  <p className={styles.stepNumber}>Paso 2 de 4</p>
-                  <h2 className={styles.stepTitle}>Información personal</h2>
-                  <p className={styles.stepDesc}>Cuéntanos un poco sobre ti.</p>
+              <div className="flex flex-col gap-7">
+                <div className="flex flex-col gap-[0.3rem]">
+                  <p className="text-[0.75rem] font-semibold text-white/35 uppercase tracking-[0.08em]">Paso 2 de 4</p>
+                  <h2 className="text-[1.25rem] font-bold text-white tracking-[-0.01em]">Información personal</h2>
+                  <p className="text-[0.88rem] text-white/45">Cuéntanos un poco sobre ti.</p>
                 </div>
-                <div className={styles.fields}>
-                  <div className={styles.field}>
-                    <label className={styles.label} htmlFor="sf-firstName">
-                      Nombre <span className={styles.required}>*</span>
+                <div className="flex flex-col gap-[1.1rem]">
+                  <div className={fieldCls}>
+                    <label className={labelCls} htmlFor="sf-firstName">
+                      Nombre <span className={requiredCls}>*</span>
                     </label>
                     <input
                       id="sf-firstName"
@@ -390,10 +397,10 @@ export default function SignupPage() {
                     {err("firstName")}
                   </div>
 
-                  <div className={styles.fieldRow}>
-                    <div className={styles.field}>
-                      <label className={styles.label} htmlFor="sf-firstLastName">
-                        Primer apellido <span className={styles.required}>*</span>
+                  <div className="grid grid-cols-2 gap-4 max-[560px]:grid-cols-1">
+                    <div className={fieldCls}>
+                      <label className={labelCls} htmlFor="sf-firstLastName">
+                        Primer apellido <span className={requiredCls}>*</span>
                       </label>
                       <input
                         id="sf-firstLastName"
@@ -406,9 +413,9 @@ export default function SignupPage() {
                       />
                       {err("firstLastName")}
                     </div>
-                    <div className={styles.field}>
-                      <label className={styles.label} htmlFor="sf-secondLastName">
-                        Segundo apellido <span className={styles.required}>*</span>
+                    <div className={fieldCls}>
+                      <label className={labelCls} htmlFor="sf-secondLastName">
+                        Segundo apellido <span className={requiredCls}>*</span>
                       </label>
                       <input
                         id="sf-secondLastName"
@@ -423,10 +430,10 @@ export default function SignupPage() {
                     </div>
                   </div>
 
-                  <div className={styles.fieldRow}>
-                    <div className={styles.field}>
-                      <label className={styles.label} htmlFor="sf-birthday">
-                        Fecha de nacimiento <span className={styles.required}>*</span>
+                  <div className="grid grid-cols-2 gap-4 max-[560px]:grid-cols-1">
+                    <div className={fieldCls}>
+                      <label className={labelCls} htmlFor="sf-birthday">
+                        Fecha de nacimiento <span className={requiredCls}>*</span>
                       </label>
                       <DateInput
                         id="sf-birthday"
@@ -436,9 +443,9 @@ export default function SignupPage() {
                       />
                       {err("birthday")}
                     </div>
-                    <div className={styles.field}>
-                      <label className={styles.label} htmlFor="sf-gender">
-                        Género <span className={styles.required}>*</span>
+                    <div className={fieldCls}>
+                      <label className={labelCls} htmlFor="sf-gender">
+                        Género <span className={requiredCls}>*</span>
                       </label>
                       <SelectInput
                         id="sf-gender"
@@ -448,7 +455,7 @@ export default function SignupPage() {
                         placeholder="Seleccionar..."
                         hasError={touched && isEmpty(form.gender)}
                       />
-                      {touched && isEmpty(form.gender) && <span className={styles.errorMsg}>Este campo es requerido</span>}
+                      {touched && isEmpty(form.gender) && <span className={errorMsgCls}>Este campo es requerido</span>}
                     </div>
                   </div>
                 </div>
@@ -457,23 +464,23 @@ export default function SignupPage() {
 
             {/* Step 2 — Contacto */}
             {step === 2 && (
-              <div className={styles.stepContent}>
-                <div className={styles.stepHeader}>
-                  <p className={styles.stepNumber}>Paso 3 de 4</p>
-                  <h2 className={styles.stepTitle}>Información de contacto</h2>
-                  <p className={styles.stepDesc}>¿Cómo podemos contactarte?</p>
+              <div className="flex flex-col gap-7">
+                <div className="flex flex-col gap-[0.3rem]">
+                  <p className="text-[0.75rem] font-semibold text-white/35 uppercase tracking-[0.08em]">Paso 3 de 4</p>
+                  <h2 className="text-[1.25rem] font-bold text-white tracking-[-0.01em]">Información de contacto</h2>
+                  <p className="text-[0.88rem] text-white/45">¿Cómo podemos contactarte?</p>
                 </div>
-                <div className={styles.fields}>
-                  <div className={styles.fieldRow}>
-                    <div className={styles.field}>
-                      <label className={styles.label} htmlFor="sf-phone">
-                        Teléfono <span className={styles.required}>*</span>
+                <div className="flex flex-col gap-[1.1rem]">
+                  <div className="grid grid-cols-2 gap-4 max-[560px]:grid-cols-1">
+                    <div className={fieldCls}>
+                      <label className={labelCls} htmlFor="sf-phone">
+                        Teléfono <span className={requiredCls}>*</span>
                       </label>
                       <input
                         id="sf-phone"
                         type="text"
                         inputMode="numeric"
-                        className={`${styles.input} ${touched && phoneError ? styles.inputError : ""}`}
+                        className={`${inputBase} ${touched && phoneError ? inputErrorCls : ""}`}
                         placeholder="88776655"
                         value={form.phone}
                         maxLength={8}
@@ -484,17 +491,17 @@ export default function SignupPage() {
                         autoComplete="tel"
                       />
                       {touched && phoneError && (
-                        <span className={styles.errorMsg}>{phoneError}</span>
+                        <span className={errorMsgCls}>{phoneError}</span>
                       )}
                     </div>
-                    <div className={styles.field}>
-                      <label className={styles.label} htmlFor="sf-phoneSecondary">
+                    <div className={fieldCls}>
+                      <label className={labelCls} htmlFor="sf-phoneSecondary">
                         Teléfono secundario
                       </label>
                       <input
                         id="sf-phoneSecondary"
                         type="tel"
-                        className={styles.input}
+                        className={inputBase}
                         placeholder="Opcional"
                         value={form.phoneSecondary}
                         onChange={set("phoneSecondary")}
@@ -503,35 +510,35 @@ export default function SignupPage() {
                     </div>
                   </div>
 
-                  <div className={styles.field}>
-                    <label className={styles.label} htmlFor="sf-address">
-                      Dirección exacta <span className={styles.required}>*</span>
+                  <div className={fieldCls}>
+                    <label className={labelCls} htmlFor="sf-address">
+                      Dirección exacta <span className={requiredCls}>*</span>
                     </label>
                     <textarea
                       id="sf-address"
-                      className={`${styles.textarea} ${touched && isEmpty(form.address) ? styles.inputError : ""}`}
+                      className={`w-full bg-[#111820] border border-white/9 rounded-[7px] text-white text-[0.92rem] font-[inherit] p-[0.75rem_1rem] outline-none transition-[border-color,background,box-shadow] duration-150 resize-y min-h-[80px] placeholder:text-white/20 focus:bg-[#0e1520] focus:border-white/[0.28] focus:shadow-[0_0_0_3px_rgba(255,255,255,0.05)] ${touched && isEmpty(form.address) ? inputErrorCls : ""}`}
                       value={form.address}
                       onChange={set("address")}
                       rows={3}
                     />
-                    {touched && isEmpty(form.address) && <span className={styles.errorMsg}>Este campo es requerido</span>}
+                    {touched && isEmpty(form.address) && <span className={errorMsgCls}>Este campo es requerido</span>}
                   </div>
 
-                  <div className={styles.field}>
-                    <label className={styles.label} htmlFor="sf-email">
-                      Correo electrónico <span className={styles.required}>*</span>
+                  <div className={fieldCls}>
+                    <label className={labelCls} htmlFor="sf-email">
+                      Correo electrónico <span className={requiredCls}>*</span>
                     </label>
                     <input
                       id="sf-email"
                       type="email"
-                      className={`${styles.input} ${touched && emailError ? styles.inputError : ""}`}
+                      className={`${inputBase} ${touched && emailError ? inputErrorCls : ""}`}
                       placeholder="correo@ejemplo.com"
                       value={form.email}
                       onChange={set("email")}
                       autoComplete="email"
                     />
                     {touched && emailError && (
-                      <span className={styles.errorMsg}>{emailError}</span>
+                      <span className={errorMsgCls}>{emailError}</span>
                     )}
                   </div>
                 </div>
@@ -540,26 +547,26 @@ export default function SignupPage() {
 
             {/* Step 3 — Confirmación */}
             {step === 3 && (
-              <div className={styles.stepContent}>
-                <div className={styles.stepHeader}>
-                  <p className={styles.stepNumber}>Paso 4 de 4</p>
-                  <h2 className={styles.stepTitle}>Finaliza tu registro</h2>
-                  <p className={styles.stepDesc}>Revisa y acepta los términos para completar tu cuenta.</p>
+              <div className="flex flex-col gap-7">
+                <div className="flex flex-col gap-[0.3rem]">
+                  <p className="text-[0.75rem] font-semibold text-white/35 uppercase tracking-[0.08em]">Paso 4 de 4</p>
+                  <h2 className="text-[1.25rem] font-bold text-white tracking-[-0.01em]">Finaliza tu registro</h2>
+                  <p className="text-[0.88rem] text-white/45">Revisa y acepta los términos para completar tu cuenta.</p>
                 </div>
-                <div className={styles.fields}>
-                  <div className={styles.summary}>
-                    <div className={styles.summaryRow}><span>Identificación</span><strong>{form.personId}</strong></div>
-                    <div className={styles.summaryRow}><span>Nombre completo</span><strong>{form.firstName} {form.firstLastName} {form.secondLastName}</strong></div>
-                    <div className={styles.summaryRow}><span>Fecha de nacimiento</span><strong>{form.birthday ? form.birthday.split("-").reverse().join("-") : ""}</strong></div>
-                    <div className={styles.summaryRow}><span>Género</span><strong>{form.gender}</strong></div>
-                    <div className={styles.summaryRow}><span>Teléfono</span><strong>{form.phone}</strong></div>
-                    <div className={styles.summaryRow}><span>Dirección</span><strong>{form.address}</strong></div>
-                    <div className={styles.summaryRow}><span>Correo</span><strong>{form.email}</strong></div>
+                <div className="flex flex-col gap-[1.1rem]">
+                  <div className="flex flex-col bg-[#111820] border border-white/8 rounded-lg overflow-hidden">
+                    <div className="flex justify-between items-baseline gap-4 p-[0.7rem_1rem] border-b border-white/[0.06] text-[0.86rem] [&>span]:text-white/45 [&>span]:shrink-0 [&>strong]:text-white/85 [&>strong]:font-medium [&>strong]:text-right"><span>Identificación</span><strong>{form.personId}</strong></div>
+                    <div className="flex justify-between items-baseline gap-4 p-[0.7rem_1rem] border-b border-white/[0.06] text-[0.86rem] [&>span]:text-white/45 [&>span]:shrink-0 [&>strong]:text-white/85 [&>strong]:font-medium [&>strong]:text-right"><span>Nombre completo</span><strong>{form.firstName} {form.firstLastName} {form.secondLastName}</strong></div>
+                    <div className="flex justify-between items-baseline gap-4 p-[0.7rem_1rem] border-b border-white/[0.06] text-[0.86rem] [&>span]:text-white/45 [&>span]:shrink-0 [&>strong]:text-white/85 [&>strong]:font-medium [&>strong]:text-right"><span>Fecha de nacimiento</span><strong>{form.birthday ? form.birthday.split("-").reverse().join("-") : ""}</strong></div>
+                    <div className="flex justify-between items-baseline gap-4 p-[0.7rem_1rem] border-b border-white/[0.06] text-[0.86rem] [&>span]:text-white/45 [&>span]:shrink-0 [&>strong]:text-white/85 [&>strong]:font-medium [&>strong]:text-right"><span>Género</span><strong>{form.gender}</strong></div>
+                    <div className="flex justify-between items-baseline gap-4 p-[0.7rem_1rem] border-b border-white/[0.06] text-[0.86rem] [&>span]:text-white/45 [&>span]:shrink-0 [&>strong]:text-white/85 [&>strong]:font-medium [&>strong]:text-right"><span>Teléfono</span><strong>{form.phone}</strong></div>
+                    <div className="flex justify-between items-baseline gap-4 p-[0.7rem_1rem] border-b border-white/[0.06] text-[0.86rem] [&>span]:text-white/45 [&>span]:shrink-0 [&>strong]:text-white/85 [&>strong]:font-medium [&>strong]:text-right"><span>Dirección</span><strong>{form.address}</strong></div>
+                    <div className="flex justify-between items-baseline gap-4 p-[0.7rem_1rem] text-[0.86rem] [&>span]:text-white/45 [&>span]:shrink-0 [&>strong]:text-white/85 [&>strong]:font-medium [&>strong]:text-right"><span>Correo</span><strong>{form.email}</strong></div>
                   </div>
 
-                  <label className={styles.termsLabel}>
+                  <label className="flex items-start gap-[0.65rem] cursor-pointer text-[0.88rem] text-white/60 select-none leading-[1.5]">
                     <span
-                      className={`${styles.checkbox} ${form.terms ? styles.checked : ""} ${touched && !form.terms ? styles.checkboxError : ""}`}
+                      className={`w-5 h-5 shrink-0 mt-px border-[1.5px] border-white/[0.22] rounded-[4px] bg-black/20 flex items-center justify-center transition-all duration-150 cursor-pointer ${form.terms ? "!bg-white/90 !border-white/90 text-[#1e272e]" : ""} ${touched && !form.terms ? "!border-[rgba(255,100,100,0.6)]" : ""}`}
                       onClick={() => setForm((p) => ({ ...p, terms: !p.terms }))}
                     >
                       {form.terms && (
@@ -572,7 +579,7 @@ export default function SignupPage() {
                       Acepto los{" "}
                       <button
                         type="button"
-                        className={styles.termsLink}
+                        className="text-white/75 underline underline-offset-2 bg-transparent border-none cursor-pointer font-[inherit] text-[inherit] p-0 transition-colors duration-150 hover:text-white"
                         onClick={(e) => { e.stopPropagation(); setTermsOpen(true); }}
                       >
                         términos y condiciones
@@ -581,30 +588,39 @@ export default function SignupPage() {
                     </span>
                   </label>
                   {touched && !form.terms && (
-                    <span className={styles.errorMsg}>Debes aceptar los términos y condiciones</span>
+                    <span className={errorMsgCls}>Debes aceptar los términos y condiciones</span>
                   )}
 
                   {submitError && (
-                    <span className={styles.errorMsg}>{submitError}</span>
+                    <span className={errorMsgCls}>{submitError}</span>
                   )}
                 </div>
               </div>
             )}
 
             {/* ── Navigation ──────────────────────────────── */}
-            <div className={styles.nav}>
+            <div className="flex justify-between items-center pt-2 border-t border-white/[0.07]">
               {step > 0 ? (
-                <button type="button" className={styles.backBtn} onClick={back}>
+                <button
+                  type="button"
+                  className="bg-transparent border border-white/15 rounded-[7px] text-white/60 text-[0.9rem] font-[inherit] py-[0.6rem] px-5 cursor-pointer transition-[border-color,color] duration-150 hover:border-white/35 hover:text-white"
+                  onClick={back}
+                >
                   ← Atrás
                 </button>
               ) : (
                 <div />
               )}
               {step < 3 ? (
-                <button type="button" className={styles.nextBtn} onClick={next} disabled={idLoading}>
+                <button
+                  type="button"
+                  className="bg-white border-none rounded-[7px] text-[#1e272e] text-[0.92rem] font-bold font-[inherit] py-[0.65rem] px-7 cursor-pointer transition-[background,transform] duration-150 tracking-[0.01em] hover:bg-white/90 hover:-translate-y-px active:translate-y-0 disabled:opacity-65 disabled:cursor-not-allowed disabled:!transform-none"
+                  onClick={next}
+                  disabled={idLoading}
+                >
                   {idLoading ? (
-                    <span className={styles.btnSpinner}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                         <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
                       </svg>
                       Consultando...
@@ -612,7 +628,12 @@ export default function SignupPage() {
                   ) : "Continuar →"}
                 </button>
               ) : (
-                <button type="submit" className={styles.nextBtn} onClick={handleSubmit} disabled={submitLoading}>
+                <button
+                  type="submit"
+                  className="bg-white border-none rounded-[7px] text-[#1e272e] text-[0.92rem] font-bold font-[inherit] py-[0.65rem] px-7 cursor-pointer transition-[background,transform] duration-150 tracking-[0.01em] hover:bg-white/90 hover:-translate-y-px active:translate-y-0 disabled:opacity-65 disabled:cursor-not-allowed disabled:!transform-none"
+                  onClick={handleSubmit}
+                  disabled={submitLoading}
+                >
                   {submitLoading ? "Registrando..." : "Registrarme"}
                 </button>
               )}
@@ -620,9 +641,13 @@ export default function SignupPage() {
           </div>
 
           {/* ── Footer link ─────────────────────────────── */}
-          <p className={styles.loginText}>
+          <p className="text-center text-[0.85rem] text-white/35">
             ¿Ya tienes cuenta?{" "}
-            <button type="button" className={styles.loginLink} onClick={() => setLoginOpen(true)}>
+            <button
+              type="button"
+              className="text-white/65 bg-transparent border-none cursor-pointer font-[inherit] text-[inherit] p-0 transition-colors duration-150 hover:text-white"
+              onClick={() => setLoginOpen(true)}
+            >
               Inicia sesión
             </button>
           </p>

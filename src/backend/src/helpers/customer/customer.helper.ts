@@ -4,7 +4,7 @@ import { ICustomer, ISignupData } from "../../interfaces/customer.interface";
 import { CustomerCredentials } from "../../models/customers/customer.credential.model";
 import { Customers } from "../../models/customers/customer.model";
 import { createCustomerCredentials } from "./customer.credential.helper";
-import { newCustomerMail } from "../emails/user.email";
+import { newCustomerMail } from "../emails/customer.email";
 
 
 export async function createCustomer(data: ISignupData): Promise<ICustomer> {

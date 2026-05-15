@@ -1,7 +1,6 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import styles from "./NotificationSystem.module.css";
 
 /* ── Types ─────────────────────────────────────────────── */
 export type NotificationType = "success" | "error" | "warning" | "info";
@@ -50,6 +49,13 @@ const ICONS: Record<NotificationType, React.ReactNode> = {
   ),
 };
 
+const TOAST_BG: Record<NotificationType, string> = {
+  success: "bg-[linear-gradient(135deg,#2e7d32,#43a047)]",
+  error:   "bg-[linear-gradient(135deg,#c62828,#e53935)]",
+  warning: "bg-[linear-gradient(135deg,#e65100,#fb8c00)]",
+  info:    "bg-[linear-gradient(135deg,#1565c0,#1e88e5)]",
+};
+
 /* ── Provider ───────────────────────────────────────────── */
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -74,17 +80,27 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     <NotificationContext.Provider value={{ showNotification, showSuccess, showError, showWarning, showInfo }}>
       {children}
 
-      <div className={styles.stack}>
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 z-[9999] flex flex-col items-center pointer-events-none">
         {notifications.map((n, index) => (
           <div
             key={n.id}
-            className={`${styles.toast} ${styles[n.type]}`}
+            className={[
+              "fixed left-1/2 -translate-x-1/2 flex items-center gap-[10px] py-3 px-4 rounded-xl",
+              "min-w-[300px] max-w-[500px] w-max",
+              "shadow-[0_8px_32px_rgba(0,0,0,0.25)] text-white text-[0.9rem] font-medium",
+              "pointer-events-auto animate-toast-slide-down transition-[top] duration-300 ease-in-out",
+              TOAST_BG[n.type],
+            ].join(" ")}
             style={{ top: `${16 + index * 72}px` }}
             role="alert"
           >
-            <span className={styles.icon}>{ICONS[n.type]}</span>
-            <span className={styles.message}>{n.message}</span>
-            <button className={styles.close} onClick={() => dismiss(n.id)} aria-label="Cerrar">
+            <span className="flex items-center shrink-0 opacity-95">{ICONS[n.type]}</span>
+            <span className="flex-1 leading-[1.4]">{n.message}</span>
+            <button
+              className="flex items-center justify-center bg-transparent border-none text-inherit cursor-pointer opacity-70 p-[2px] rounded shrink-0 transition-opacity duration-150 hover:opacity-100"
+              onClick={() => dismiss(n.id)}
+              aria-label="Cerrar"
+            >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
               </svg>

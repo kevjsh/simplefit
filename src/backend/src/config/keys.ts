@@ -25,7 +25,7 @@ export const simplefitInfo = {
     },
   },
   account: {
-    from: '"Notificación SIMPLEFIT" <info@simplefitcr.com>',
+    from: '"Notificación SimpleFit" <info@simplefitcr.com>',
     to: "",
     cc: "",
     subject: "SIMPLEFIT",
