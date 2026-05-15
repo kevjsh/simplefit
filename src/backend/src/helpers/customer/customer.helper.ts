@@ -47,6 +47,11 @@ export async function getCustomer(email: string): Promise<ICustomer | null> {
     return customer;
 }
 
+export async function getCustomerByNID(nid: string): Promise<ICustomer | null> {
+
+    return await Customers.findOne({ where: { NID: nid } });
+}
+
 
 export async function checkPassword(customer: ICustomer, password: string): Promise<boolean> {
 

@@ -46,7 +46,7 @@ export default function Footer() {
             className="object-contain object-left brightness-0 invert !w-[120px] md:!w-[140px] !h-auto"
           />
           <p className="text-[0.88rem] text-[rgba(255,255,255,0.45)] leading-[1.65] md:max-w-[300px]">
-            Un gimnasio completo, espacioso, donde podrás realizar tus rutinas de una manera más cómoda.
+            SimpleFit es una plataforma de gestión para gimnasios. Centraliza todo en un solo lugar.
           </p>
         </div>
 

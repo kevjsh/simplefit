@@ -9,6 +9,7 @@ import DateInput from "../../utils/DateInput";
 import SelectInput from "../../utils/SelectInput";
 import TermsModal from "./TermsModal";
 import { signupCustomer } from "../../../../services/auth.service";
+import { lookupCustomerByNID } from "../../../../services/customer.service";
 import { useNotifications } from "../../utils/NotificationSystem";
 
 /* ── Types ─────────────────────────────────────────────── */
@@ -161,22 +162,23 @@ export default function SignupPage() {
     setTouched(true);
     if (stepErrors[step]) return;
 
-    /* Step 0 — cédula nacional: consultar Hacienda */
-    if (step === 0 && form.idType === "nacional") {
+    /* Step 0 — verificar cédula en DB y enriquecer con Hacienda */
+    if (step === 0) {
       setIdLoading(true);
       try {
-        const res = await fetch(
-          `https://api.hacienda.go.cr/fe/ae?identificacion=${form.personId}`
-        );
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.nombre) {
-            const parsed = parseName(data.nombre);
-            setForm((p) => ({ ...p, ...parsed }));
-          }
+        const data = await lookupCustomerByNID(form.personId);
+        if (data.name) {
+          const parsed = parseName(data.name);
+          setForm((p) => ({ ...p, ...parsed }));
         }
-      } catch {
-        // Silently continue — user fills fields manually
+      } catch (err: unknown) {
+        const status = (err as { response?: { status?: number } })?.response?.status;
+        if (status === 409) {
+          notify.error("Esta cédula ya se encuentra registrada.");
+          setIdLoading(false);
+          return;
+        }
+        // Otros errores (red, timeout): continuar sin auto-completar nombre
       } finally {
         setIdLoading(false);
       }

@@ -24,22 +24,11 @@ export default function Home() {
       <main className="flex flex-col items-center pt-(--spacing-nav-h) md:flex-1 md:min-h-0">
         {/* ── Hero ── */}
         <section className="flex flex-col items-center justify-center text-center px-[1.25rem] pt-[2.5rem] pb-[1.5rem] gap-[1.1rem] md:flex-1 md:min-h-0 md:px-6 md:pt-6 md:pb-4 md:gap-[0.9rem]">
-          <div className="mb-1">
-            <Image
-              src="https://firebasestorage.googleapis.com/v0/b/simplefit-6c181.firebasestorage.app/o/logos%2Fsimplefit.png?alt=media&token=64cccbb6-387b-4399-94d3-77b6c960ad34"
-              alt="Simplefit"
-              width={140}
-              height={140}
-              priority
-              className="object-contain drop-shadow-[0_4px_18px_rgba(0,0,0,0.35)]"
-            />
-          </div>
           <h1 className="text-[clamp(1.75rem,5vw,2.75rem)] font-extrabold text-white tracking-[-0.02em] leading-[1.15] [text-shadow:0_2px_12px_rgba(0,0,0,0.25)]">
             Bienvenido a Simplefit
           </h1>
           <p className="max-w-[500px] text-base text-white/78 leading-[1.65] md:text-[clamp(0.95rem,2vw,1.1rem)]">
-            Un gimnasio completo, espacioso, donde podrás realizar tus rutinas
-            de una manera más cómoda.
+            SimpleFit es una plataforma de gestión para gimnasios. Centraliza todo en un solo lugar.
           </p>
           <div className="flex flex-col items-stretch w-full max-w-[320px] gap-[0.85rem] justify-center mt-2 md:flex-row md:flex-wrap md:w-auto md:max-w-none">
             <button
