@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "pm2 start node_modules/.bin/next --name \"SimpleFit Frontend\" -- start --port 3000",
+    "start": "pm2 start pnpm --name \"SimpleFit Frontend\" -- start",
     "dev": "next dev --port 3000 --hostname 0.0.0.0",
     "build": "next build",
     "lint": "next lint"
