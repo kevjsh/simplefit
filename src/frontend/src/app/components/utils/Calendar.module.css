@@ -1,0 +1,226 @@
+.calendar {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  z-index: 300;
+  width: 280px;
+  background: #1a2228;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+  padding: 0.75rem;
+  animation: calIn 0.15s ease;
+}
+
+@keyframes calIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.headerLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  border-radius: 5px;
+  transition: background 0.12s;
+  text-transform: capitalize;
+}
+
+.headerLabel:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.headerLabel svg {
+  color: rgba(255, 255, 255, 0.45);
+  flex-shrink: 0;
+}
+
+.navBtns {
+  display: flex;
+  gap: 2px;
+}
+
+.navBtn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.navBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* ── Week row ────────────────────────────────────────────── */
+.weekRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 0.3rem;
+}
+
+.weekDay {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 0.2rem 0;
+  text-transform: uppercase;
+}
+
+/* ── Day grid ────────────────────────────────────────────── */
+.dayGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  font-size: 0.82rem;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.day:hover:not(:disabled):not(.daySelected) {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+}
+
+.dayEmpty {
+  cursor: default;
+  color: transparent;
+}
+
+.dayToday {
+  color: #fff;
+  font-weight: 700;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+}
+
+.daySelected {
+  background: #fff !important;
+  color: #1a2228 !important;
+  font-weight: 700;
+}
+
+/* ── Month picker ────────────────────────────────────────── */
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 0.25rem 0;
+}
+
+.monthBtn {
+  padding: 0.55rem 0;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.83rem;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  text-transform: capitalize;
+  transition: background 0.12s, color 0.12s;
+}
+
+.monthBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.monthSelected {
+  background: #fff !important;
+  color: #1a2228 !important;
+  font-weight: 700;
+}
+
+/* ── Year picker ─────────────────────────────────────────── */
+.yearGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 0.25rem 0;
+}
+
+.yearBtn {
+  padding: 0.55rem 0;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.83rem;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.yearBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.yearSelected {
+  background: #fff !important;
+  color: #1a2228 !important;
+  font-weight: 700;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.todayBtn {
+  background: transparent;
+  border: none;
+  font-size: 0.78rem;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  transition: color 0.12s, background 0.12s;
+}
+
+.todayBtn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}

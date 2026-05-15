@@ -1,0 +1,119 @@
+/* ── Shell ─────────────────────────────────────────────── */
+.footer {
+  background: #161d23;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  margin-top: auto;
+}
+
+/* ── Main row ──────────────────────────────────────────── */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 1.25rem;
+  display: flex;
+  gap: 4rem;
+  flex-wrap: wrap;
+}
+
+/* ── Brand column ──────────────────────────────────────── */
+.brand {
+  flex: 1 1 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.brandLogo {
+  object-fit: contain;
+  object-position: left center;
+  filter: brightness(0) invert(1);
+  width: 140px !important;
+  height: auto !important;
+}
+
+.brandDesc {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.65;
+  max-width: 300px;
+}
+
+/* ── Contact column ────────────────────────────────────── */
+.contact {
+  flex: 1 1 200px;
+}
+
+.colTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1.1rem;
+}
+
+.contactList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.contactItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.contactIcon {
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.contactText {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+}
+
+.contactText a {
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.15s;
+}
+
+.contactText a:hover {
+  color: #fff;
+}
+
+/* ── Bottom bar ────────────────────────────────────────── */
+.bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+}
+
+.bottom p {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .main {
+    flex-direction: column;
+    gap: 1.75rem;
+    padding: 2rem 1.25rem 1.5rem;
+  }
+
+  .brandLogo {
+    width: 120px !important;
+  }
+
+  .brandDesc {
+    max-width: 100%;
+  }
+
+  .bottom {
+    padding: 0.9rem 1.25rem;
+  }
+}
