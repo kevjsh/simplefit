@@ -4,9 +4,9 @@
   "description": "Simplefit API backend",
   "main": "build/server.js",
   "scripts": {
+    "start": "pm2 start build/server.js --name Simplefit",
     "dev": "tsc-watch --onSuccess \"node build/server.js\"",
     "build": "tsc",
-    "start": "node build/server.js",
     "clean": "rm -rf build"
   },
   "dependencies": {
