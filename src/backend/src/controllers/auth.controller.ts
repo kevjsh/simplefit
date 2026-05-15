@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { ISignupData } from "../interfaces/customer.interface";
-import { createCustomer, getCustomer, checkPassword } from "../helpers/Customer/customer.helper";
+import { createCustomer, getCustomer, checkPassword } from "../helpers/customer/customer.helper";
 import { generateToken, generateRefreshToken } from "../helpers/jwtGenerator";
 import { logger } from "../helpers/logger.helper";
 import { cookieParams } from "../config/keys";

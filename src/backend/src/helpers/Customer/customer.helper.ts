@@ -58,6 +58,7 @@ export async function checkPassword(customer: ICustomer, password: string): Prom
             // TempPassword didn't match — try the regular password
             if (!customerCreds.Password || !bcrypt.compareSync(password, customerCreds.Password))
                 return false;
+
             // Regular password matched → TempPassword no longer needed
             await CustomerCredentials.update({ TempPassword: null }, { where: { CustomerId: customer.Id } });
         }
