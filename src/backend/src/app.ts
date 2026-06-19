@@ -28,6 +28,8 @@ export class App {
         "http://localhost:4000",
         "http://192.168.40.6:3000",
         "http://192.168.40.6:4000",
+        "https://simplefitcr.com",
+        "https://www.simplefitcr.com",
       ],
     }));
     this.app.use(express.json());

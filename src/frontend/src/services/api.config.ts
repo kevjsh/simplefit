@@ -1,16 +1,8 @@
 import axios, { AxiosRequestConfig, Method } from "axios";
 import { tokenStore } from "../lib/tokenStore";
 
-function getApiBaseUrl(): string {
-  if (typeof window === "undefined") return "http://localhost:4000";
-  const { hostname } = window.location;
-  if (hostname === "localhost" || hostname === "127.0.0.1") return "http://localhost:4000";
-  if (hostname.startsWith("192.168.") || hostname.startsWith("10.") || hostname.startsWith("172."))
-    return `http://${hostname}:4000`;
-  return `${window.location.protocol}//${hostname}`;
-}
-
-const API_BASE_URL = getApiBaseUrl();
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 const ensureLeadingSlash = (p: string) => (p.startsWith("/") ? p : `/${p}`);
 
