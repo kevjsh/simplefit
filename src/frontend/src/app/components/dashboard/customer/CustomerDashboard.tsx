@@ -1,50 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "../../../../context/AuthContext";
 import Navbar from "../../navbar/Navbar";
 import Footer from "../../footer/Footer";
 import ChangePasswordModal from "../../auth/security/ChangePasswordModal";
 
-interface TokenPayload {
-  NID: string;
-  Name: string;
-  Email: string;
-  iat: number;
-  exp: number;
-}
-
-function decodeToken(token: string): TokenPayload | null {
-  try {
-    const payload = token.split(".")[1];
-    return JSON.parse(atob(payload)) as TokenPayload;
-  } catch {
-    return null;
-  }
-}
-
 export default function CustomerDashboard() {
-  const router = useRouter();
-  const { logout: _logout } = useAuth();
-  const [payload, setPayload] = useState<TokenPayload | null>(null);
+  const { user } = useAuth();
   const [isTempPassword, setIsTempPassword] = useState(false);
   const [changePassOpen, setChangePassOpen] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (!token) { router.replace("/"); return; }
-
-    const decoded = decodeToken(token);
-    if (!decoded) { router.replace("/"); return; }
-
     const tempPass = sessionStorage.getItem("isTempPassword") === "true";
-    setPayload(decoded);
     setIsTempPassword(tempPass);
     if (tempPass) setChangePassOpen(true);
-  }, [router]);
+  }, []);
 
-  if (!payload) return null;
+  // El middleware ya garantiza que solo usuarios autenticados llegan aquí.
+  // Mientras el AuthContext restaura el user desde /api/auth/me, mostramos nada.
+  if (!user) return null;
 
   return (
     <div className="h-screen flex flex-col bg-[#0f1519] overflow-y-auto scrollbar-thin-dark">
@@ -63,7 +38,7 @@ export default function CustomerDashboard() {
           {/* Greeting */}
           <div className="flex flex-col gap-2">
             <h1 className="text-[1.85rem] font-extrabold text-white tracking-[-0.03em] leading-[1.15]">
-              ¡Bienvenido, {payload.Name}!
+              ¡Bienvenido, {user.Name}!
             </h1>
             <p className="text-[0.95rem] text-white/45 leading-[1.6]">
               Nos alegra estés aquí.
@@ -99,7 +74,7 @@ export default function CustomerDashboard() {
           sessionStorage.removeItem("isTempPassword");
           setIsTempPassword(false);
         }}
-        email={payload.Email}
+        email={user.Email}
         isTempPassword={isTempPassword}
       />
     </div>

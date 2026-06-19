@@ -7,18 +7,24 @@ export interface LoginPayload {
 }
 
 export interface LoginResponse {
-  message: string;
   token: string;
   isTempPassword: boolean;
 }
 
 export async function loginCustomer(payload: LoginPayload): Promise<LoginResponse> {
-  return apiRequest<LoginResponse, LoginPayload>({
+  const res = await fetch("/api/auth/login", {
     method: "POST",
-    url: "/api/login",
-    body: payload,
-    withCredentials: true,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
   });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw { response: { data } };
+  }
+
+  return data as LoginResponse;
 }
 
 /* ── Signup ─────────────────────────────────────────────── */

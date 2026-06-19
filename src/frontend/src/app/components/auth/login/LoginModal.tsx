@@ -97,9 +97,9 @@ export default function LoginModal({ open, onClose }: LoginModalProps) {
           <Image
             src="https://firebasestorage.googleapis.com/v0/b/simplefit-6c181.firebasestorage.app/o/logos%2Fsimplefit.png?alt=media&token=64cccbb6-387b-4399-94d3-77b6c960ad34"
             alt="SimpleFit"
-            width={150}
-            height={60}
-            className="object-contain brightness-0 invert !w-[130px] !h-auto"
+            width={130}
+            height={52}
+            className="object-contain brightness-0 invert"
             priority
           />
         </div>

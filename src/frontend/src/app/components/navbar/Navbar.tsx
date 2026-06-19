@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import LoginModal from "../auth/login/LoginModal";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -33,15 +34,15 @@ export default function Navbar() {
     <>
       <nav className="fixed top-0 left-0 right-0 z-[200] bg-[rgba(30,39,46,0.96)] backdrop-blur-[8px] border-b border-[rgba(255,255,255,0.08)]">
         <div className="flex items-center h-[72px] px-6 max-w-[1100px] mx-auto justify-center relative sm:justify-start sm:static">
-          <a href="/" className="flex items-center gap-[0.65rem] sm:mr-auto">
+          <Link href="/" className="flex items-center gap-[0.65rem] sm:mr-auto">
             <Image
               src="https://firebasestorage.googleapis.com/v0/b/simplefit-6c181.firebasestorage.app/o/logos%2Fsimplefit.png?alt=media&token=64cccbb6-387b-4399-94d3-77b6c960ad34"
               alt="SimpleFit logo"
               width={160}
-              height={80}
-              className="object-contain brightness-0 invert !w-[160px] !h-auto"
+              height={64}
+              className="object-contain brightness-0 invert"
             />
-          </a>
+          </Link>
 
           <ul className="hidden sm:flex">
             {isLoggedIn ? (

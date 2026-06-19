@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "./components/navbar/Navbar";
 import Footer from "./components/footer/Footer";
@@ -10,12 +9,6 @@ import LoginModal from "./components/auth/login/LoginModal";
 export default function Home() {
   const [loginOpen, setLoginOpen] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    if (localStorage.getItem("authToken")) {
-      router.replace("/dashboard/customer");
-    }
-  }, [router]);
 
   return (
     <>

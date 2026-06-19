@@ -41,9 +41,9 @@ export default function Footer() {
           <Image
             src="https://firebasestorage.googleapis.com/v0/b/simplefit-6c181.firebasestorage.app/o/logos%2Fsimplefit.png?alt=media&token=64cccbb6-387b-4399-94d3-77b6c960ad34"
             alt="SimpleFit"
-            width={140}
-            height={70}
-            className="object-contain object-left brightness-0 invert !w-[120px] md:!w-[140px] !h-auto"
+            width={120}
+            height={48}
+            className="object-contain object-left brightness-0 invert md:w-[140px] md:h-[56px]"
           />
           <p className="text-[0.88rem] text-[rgba(255,255,255,0.45)] leading-[1.65] md:max-w-[300px]">
             SimpleFit es una plataforma de gestión para gimnasios. Centraliza todo en un solo lugar.

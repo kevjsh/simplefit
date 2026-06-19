@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, Method } from "axios";
+import { tokenStore } from "../lib/tokenStore";
 
 function getApiBaseUrl(): string {
   if (typeof window === "undefined") return "http://localhost:4000";
@@ -34,8 +35,7 @@ type ApiRequestOptions<TBody = unknown> = {
 export async function apiRequest<TResponse = unknown, TBody = unknown>(
   options: ApiRequestOptions<TBody>
 ): Promise<TResponse> {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+  const token = tokenStore.get();
 
   const normalizedUrl = stripApiPrefix(options.url || "");
 
