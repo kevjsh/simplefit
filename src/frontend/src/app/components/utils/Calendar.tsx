@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -50,6 +50,17 @@ export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
   const nextMonth = () => {
     if (viewMonth === 11) { setViewMonth(0); setViewYear((y) => y + 1); }
     else setViewMonth((m) => m + 1);
+  };
+
+  const handlePrev = () => {
+    if (mode === "years") setViewYear((y) => y - 12);
+    else if (mode === "months") setViewYear((y) => y - 1);
+    else prevMonth();
+  };
+  const handleNext = () => {
+    if (mode === "years") setViewYear((y) => y + 12);
+    else if (mode === "months") setViewYear((y) => y + 1);
+    else nextMonth();
   };
 
   const selectDay = (d: number) => {
@@ -105,28 +116,30 @@ export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
     >
       {/* ── Header ──────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-[0.65rem]">
-        <button
-          type="button"
-          className="flex items-center gap-[0.35rem] bg-transparent text-white text-[0.9rem] font-semibold font-[inherit] cursor-pointer py-[0.3rem] px-2 rounded-[5px] transition-[background] duration-[120ms] hover:bg-white/[0.07] capitalize [&_svg]:text-white/45 [&_svg]:shrink-0"
-          onClick={() => setMode(mode === "days" ? "months" : "days")}
-        >
-          {MONTHS[viewMonth]} {viewYear}
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </button>
+        <div className="flex items-center gap-0.5">
+          {/* Month — click to toggle month picker */}
+          <button
+            type="button"
+            className="bg-transparent font-semibold font-[inherit] cursor-pointer py-[0.3rem] px-2 rounded-[5px] transition-[background,color] duration-[120ms] capitalize text-[0.9rem] hover:bg-white/[0.07] text-white"
+            onClick={() => setMode(mode === "months" ? "days" : "months")}
+          >
+            {MONTHS[viewMonth]}
+          </button>
+          {/* Year — click to toggle year picker */}
+          <button
+            type="button"
+            className={[
+              "bg-transparent font-semibold font-[inherit] cursor-pointer py-[0.3rem] px-2 rounded-[5px] transition-[background,color] duration-[120ms] text-[0.9rem] hover:bg-white/[0.07]",
+              mode === "years" ? "text-white bg-white/[0.07]" : "text-white/60 hover:text-white",
+            ].join(" ")}
+            onClick={() => setMode(mode === "years" ? "days" : "years")}
+          >
+            {viewYear}
+          </button>
+        </div>
         <div className="flex gap-0.5">
-          {mode === "years" ? (
-            <>
-              <button type="button" className={NAV_BTN} onClick={() => setViewYear((y) => y - 12)}>‹</button>
-              <button type="button" className={NAV_BTN} onClick={() => setViewYear((y) => y + 12)}>›</button>
-            </>
-          ) : (
-            <>
-              <button type="button" className={NAV_BTN} onClick={prevMonth}>‹</button>
-              <button type="button" className={NAV_BTN} onClick={nextMonth}>›</button>
-            </>
-          )}
+          <button type="button" className={NAV_BTN} onClick={handlePrev}>‹</button>
+          <button type="button" className={NAV_BTN} onClick={handleNext}>›</button>
         </div>
       </div>
 
@@ -178,18 +191,23 @@ export default function Calendar({ value, onSelect, onClose }: CalendarProps) {
 
       {/* ── Year picker ─────────────────────────────────── */}
       {mode === "years" && (
-        <div className="grid grid-cols-3 gap-1 py-1">
-          {years.map((y) => (
-            <button
-              key={y}
-              type="button"
-              className={pickerBtnClasses(y === viewYear)}
-              onClick={() => { setViewYear(y); setMode("months"); }}
-            >
-              {y}
-            </button>
-          ))}
-        </div>
+        <>
+          <div className="text-center text-[0.68rem] font-semibold text-white/25 uppercase tracking-[0.07em] mb-1.5">
+            {yearStart} – {yearStart + 11}
+          </div>
+          <div className="grid grid-cols-3 gap-1 py-1">
+            {years.map((y) => (
+              <button
+                key={y}
+                type="button"
+                className={pickerBtnClasses(y === viewYear)}
+                onClick={() => { setViewYear(y); setMode("months"); }}
+              >
+                {y}
+              </button>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Footer shortcut */}

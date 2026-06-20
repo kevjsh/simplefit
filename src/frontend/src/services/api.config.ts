@@ -1,8 +1,10 @@
 import axios, { AxiosRequestConfig, Method } from "axios";
 import { tokenStore } from "../lib/tokenStore";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+// En producción NEXT_PUBLIC_API_URL = "https://api.simplefitcr.com" (llamada directa).
+// En desarrollo no se define, quedando vacío para que las URLs sean relativas
+// y el rewrite de next.config.ts las enrute al servidor Express.
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 const ensureLeadingSlash = (p: string) => (p.startsWith("/") ? p : `/${p}`);
 

@@ -5,6 +5,7 @@ import IndexRoutes from "./routes/index.routes";
 import { logger, loggerMiddleware } from "./helpers/logger.helper";
 import { COOKIE_SECRET_KEY } from "./config/keys";
 import { connectDB } from "./config/database";
+import { initializeFirebase } from "./config/firebase.config";
 
 export class App {
   private app: Application;
@@ -17,6 +18,7 @@ export class App {
     this.routes();
 
     connectDB();
+    initializeFirebase();
   }
 
   private middlewares() {

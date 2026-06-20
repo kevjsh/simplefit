@@ -7,7 +7,6 @@ import {
   useState,
   ReactNode,
 } from "react";
-import { useRouter } from "next/navigation";
 import { tokenStore } from "../lib/tokenStore";
 
 export interface AuthUser {
@@ -17,11 +16,16 @@ export interface AuthUser {
 }
 
 interface AuthContextType {
+  authLoading: boolean;
   isLoggedIn: boolean;
   user: AuthUser | null;
+  profilePicture: string | null;
+  updateProfilePicture: (url: string | null) => void;
   login: (token: string) => void;
   logout: () => Promise<void>;
 }
+
+const PICTURE_KEY = "sf_profile_pic";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -34,10 +38,18 @@ function decodeUser(token: string): AuthUser | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const router = useRouter();
+  const [authLoading, setAuthLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
+  /* Restore persisted picture immediately (sync, client-only) */
+  useEffect(() => {
+    const stored = localStorage.getItem(PICTURE_KEY);
+    if (stored) setProfilePicture(stored);
+  }, []);
+
+  /* Verify session on every mount */
   useEffect(() => {
     fetch("/api/auth/me")
       .then((r) => (r.ok ? r.json() : null))
@@ -46,28 +58,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           tokenStore.set(data.token);
           setIsLoggedIn(true);
           setUser(data.payload as AuthUser);
+        } else {
+          /* Not authenticated — clear any stale picture */
+          localStorage.removeItem(PICTURE_KEY);
+          setProfilePicture(null);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setAuthLoading(false));
   }, []);
 
   function login(token: string) {
     tokenStore.set(token);
-    const decoded = decodeUser(token);
     setIsLoggedIn(true);
-    setUser(decoded);
+    setUser(decodeUser(token));
   }
 
   async function logout() {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     tokenStore.clear();
+    localStorage.removeItem(PICTURE_KEY);
     setIsLoggedIn(false);
     setUser(null);
-    router.push("/");
+    setProfilePicture(null);
+    /* Hard navigation — always works regardless of router state */
+    window.location.replace("/");
+  }
+
+  function updateProfilePicture(url: string | null) {
+    setProfilePicture(url);
+    if (url) {
+      localStorage.setItem(PICTURE_KEY, url);
+    } else {
+      localStorage.removeItem(PICTURE_KEY);
+    }
   }
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>
+    <AuthContext.Provider
+      value={{ authLoading, isLoggedIn, user, profilePicture, updateProfilePicture, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

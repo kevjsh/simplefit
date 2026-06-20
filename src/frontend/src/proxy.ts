@@ -10,13 +10,13 @@ function isTokenExpired(token: string): boolean {
   }
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const token = request.cookies.get("authToken")?.value;
   const { pathname } = request.nextUrl;
 
   const isValid = !!token && !isTokenExpired(token);
 
-  if (pathname.startsWith("/dashboard")) {
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/profile")) {
     if (!isValid) {
       const response = NextResponse.redirect(new URL("/", request.url));
       if (token) response.cookies.delete("authToken");
@@ -33,5 +33,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/signup", "/dashboard/:path*"],
+  matcher: ["/", "/signup", "/dashboard/:path*", "/profile"],
 };

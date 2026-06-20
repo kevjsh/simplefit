@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { loginCustomer } from "../../../../services/auth.service";
+import { getCustomerProfile } from "../../../../services/customer.service";
 import { useNotifications } from "../../utils/NotificationSystem";
 import { useAuth } from "../../../../context/AuthContext";
 import RecoveryPasswordModal from "../security/RecoveryPasswordModal";
@@ -17,7 +18,7 @@ interface LoginModalProps {
 export default function LoginModal({ open, onClose }: LoginModalProps) {
   const router = useRouter();
   const notify = useNotifications();
-  const { login } = useAuth();
+  const { login, updateProfilePicture } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -43,6 +44,12 @@ export default function LoginModal({ open, onClose }: LoginModalProps) {
         localStorage.removeItem("sf_remembered_email");
       }
       login(data.token);
+
+      /* Fetch profile immediately to populate the picture in the navbar */
+      getCustomerProfile(email)
+        .then((profile) => updateProfilePicture(profile.ProfilePicture))
+        .catch(() => {});
+
       sessionStorage.setItem("isTempPassword", data.isTempPassword ? "true" : "false");
       onClose();
       router.push("/dashboard/customer");

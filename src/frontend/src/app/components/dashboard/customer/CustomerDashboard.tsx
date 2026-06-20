@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../../../../context/AuthContext";
 import Navbar from "../../navbar/Navbar";
 import Footer from "../../footer/Footer";
 import ChangePasswordModal from "../../auth/security/ChangePasswordModal";
 
 export default function CustomerDashboard() {
-  const { user } = useAuth();
+  const router = useRouter();
+  const { authLoading, isLoggedIn, user } = useAuth();
   const [isTempPassword, setIsTempPassword] = useState(false);
   const [changePassOpen, setChangePassOpen] = useState(false);
 
@@ -17,9 +19,17 @@ export default function CustomerDashboard() {
     if (tempPass) setChangePassOpen(true);
   }, []);
 
-  // El middleware ya garantiza que solo usuarios autenticados llegan aquí.
-  // Mientras el AuthContext restaura el user desde /api/auth/me, mostramos nada.
-  if (!user) return null;
+  /* Redirect to home once we know the user is not authenticated */
+  useEffect(() => {
+    if (!authLoading && !isLoggedIn) {
+      router.push("/");
+    }
+  }, [authLoading, isLoggedIn, router]);
+
+  /* While auth resolves (or during logout transition) keep the dark bg visible */
+  if (authLoading || !user) {
+    return <div className="h-screen bg-[#0f1519]" />;
+  }
 
   return (
     <div className="h-screen flex flex-col bg-[#0f1519] overflow-y-auto scrollbar-thin-dark">

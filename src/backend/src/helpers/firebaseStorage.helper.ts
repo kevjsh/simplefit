@@ -109,10 +109,10 @@ class FirebaseStorageHelper {
     }
   }
 
-  public generateProfilePicturePath(userId: string, originalName: string): string {
+  public generateProfilePicturePath(email: string, originalName: string): string {
     const timestamp = Date.now();
     const extension = originalName.split('.').pop() || 'jpg';
-    return `customers/profile-pictures/${userId}_${timestamp}.${extension}`;
+    return `customers/profile-pictures/${email}_${timestamp}.${extension}`;
   }
 
   public extractPathFromURL(url: string): string {

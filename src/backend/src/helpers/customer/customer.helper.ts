@@ -16,7 +16,7 @@ export async function createCustomer(data: ISignupData): Promise<ICustomer> {
         Name: data.Name,
         FirstLastName: data.FirstLastName,
         SecondLastName: data.SecondLastName,
-        Birthday: new Date(data.Birthday),
+        Birthday: new Date(data.Birthday + "T12:00:00"),
         Gender: data.Gender,
         FirstTelephone: Number(data.FirstTelephone),
         SecondTelephone: data.SecondTelephone ? Number(data.SecondTelephone) : null,
@@ -50,6 +50,19 @@ export async function getCustomer(email: string): Promise<ICustomer | null> {
 export async function getCustomerByNID(nid: string): Promise<ICustomer | null> {
 
     return await Customers.findOne({ where: { NID: nid } });
+}
+
+export async function getCustomerProfile(email: string): Promise<Omit<ICustomer, 'UserRoles'> | null> {
+
+    return await Customers.findOne({
+        where: { Email: email },
+        attributes: [
+            'Id', 'NID', 'Name', 'FirstLastName', 'SecondLastName',
+            'Birthday', 'Gender', 'FirstTelephone', 'SecondTelephone',
+            'Address', 'Email', 'Details', 'ProfilePicture',
+            'RegistrationDate', 'LastLogin', 'Status',
+        ],
+    });
 }
 
 
