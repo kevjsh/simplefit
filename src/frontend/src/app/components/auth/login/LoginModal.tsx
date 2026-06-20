@@ -43,12 +43,11 @@ export default function LoginModal({ open, onClose }: LoginModalProps) {
       } else {
         localStorage.removeItem("sf_remembered_email");
       }
-      login(data.token);
 
-      /* Fetch profile immediately to populate the picture in the navbar */
-      getCustomerProfile(email)
-        .then((profile) => updateProfilePicture(profile.ProfilePicture))
-        .catch(() => {});
+      /* Fetch profile from the API — single source of truth for display data */
+      const profile = await getCustomerProfile(email);
+      login(data.token, { NID: profile.NID, Name: profile.Name, Email: profile.Email });
+      updateProfilePicture(profile.ProfilePicture ?? null);
 
       sessionStorage.setItem("isTempPassword", data.isTempPassword ? "true" : "false");
       onClose();

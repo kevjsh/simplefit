@@ -8,6 +8,7 @@ import {
   ReactNode,
 } from "react";
 import { tokenStore } from "../lib/tokenStore";
+import { getCustomerProfile } from "../services/customer.service";
 
 export interface AuthUser {
   NID: string;
@@ -21,21 +22,13 @@ interface AuthContextType {
   user: AuthUser | null;
   profilePicture: string | null;
   updateProfilePicture: (url: string | null) => void;
-  login: (token: string) => void;
+  login: (token: string, user: AuthUser) => void;
   logout: () => Promise<void>;
 }
 
 const PICTURE_KEY = "sf_profile_pic";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-function decodeUser(token: string): AuthUser | null {
-  try {
-    return JSON.parse(atob(token.split(".")[1])) as AuthUser;
-  } catch {
-    return null;
-  }
-}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [authLoading, setAuthLoading] = useState(true);
@@ -49,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (stored) setProfilePicture(stored);
   }, []);
 
-  /* Verify session on every mount */
+  /* Verify session on every mount — get display data from the API, not the token */
   useEffect(() => {
     fetch("/api/auth/me")
       .then((r) => (r.ok ? r.json() : null))
@@ -57,9 +50,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (data?.authenticated && data.token) {
           tokenStore.set(data.token);
           setIsLoggedIn(true);
-          setUser(data.payload as AuthUser);
+          /* Email in the JWT payload is always ASCII — safe to use directly */
+          return getCustomerProfile(data.payload.Email).then((profile) => {
+            setUser({ NID: profile.NID, Name: profile.Name, Email: profile.Email });
+            updateProfilePicture(profile.ProfilePicture ?? null);
+          });
         } else {
-          /* Not authenticated — clear any stale picture */
           localStorage.removeItem(PICTURE_KEY);
           setProfilePicture(null);
         }
@@ -68,10 +64,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setAuthLoading(false));
   }, []);
 
-  function login(token: string) {
+  function login(token: string, user: AuthUser) {
     tokenStore.set(token);
     setIsLoggedIn(true);
-    setUser(decodeUser(token));
+    setUser(user);
   }
 
   async function logout() {
@@ -81,7 +77,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoggedIn(false);
     setUser(null);
     setProfilePicture(null);
-    /* Hard navigation — always works regardless of router state */
     window.location.replace("/");
   }
 
