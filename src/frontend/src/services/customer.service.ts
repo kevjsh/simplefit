@@ -7,6 +7,23 @@ export interface NIDLookupResponse {
   name: string | null;
 }
 
+export interface Role {
+  Id: string;
+  RoleType: string;
+  Description: string | null;
+}
+
+export interface UserRole {
+  Id: string;
+  CustomerId: string;
+  RoleId: string;
+  BranchId: number;
+  AssignedBy: string;
+  AssignedAt: string;
+  Status: string;
+  Role?: Role;
+}
+
 export interface CustomerProfile {
   Id: string;
   NID: string;
@@ -24,6 +41,7 @@ export interface CustomerProfile {
   RegistrationDate: string | null;
   LastLogin: string | null;
   Status: string;
+  UserRoles?: UserRole[];
 }
 
 export async function lookupCustomerByNID(nid: string): Promise<NIDLookupResponse> {

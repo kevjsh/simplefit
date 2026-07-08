@@ -358,7 +358,7 @@ export default function ProfilePage() {
 
           {/* Back link */}
           <Link
-            href="/dashboard/customer"
+            href="/"
             className="inline-flex items-center gap-1.5 text-[0.76rem] text-white/30 hover:text-white/60 transition-colors duration-150 mb-5 tracking-wide"
           >
             <IconArrowLeft />

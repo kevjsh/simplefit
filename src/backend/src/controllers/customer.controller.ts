@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import axios from "axios";
-import { getCustomerByNID, getCustomerProfile, updateCustomerProfilePicture } from "../helpers/customer/customer.helper";
+import { getCustomerByNID, getCustomerProfile, getCustomerActiveRoles, updateCustomerProfilePicture } from "../helpers/customer/customer.helper";
 import { firebaseStorageHelper } from "../helpers/firebaseStorage.helper";
 import { logger } from "../helpers/logger.helper";
 import { Customers } from "../models/customers/customer.model";
@@ -49,7 +49,11 @@ export const getProfileByEmail = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    res.status(200).json(customer);
+    const activeRoles = await getCustomerActiveRoles((customer as any).Id);
+    const payload: any = (customer as any).toJSON ? (customer as any).toJSON() : customer;
+    payload.UserRoles = activeRoles;
+
+    res.status(200).json(payload);
   } catch (error) {
     logger.error(`Get profile error. ${error}`);
     res.status(500).json({ message: "Internal server error." });

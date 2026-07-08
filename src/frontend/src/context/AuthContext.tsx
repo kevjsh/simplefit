@@ -4,11 +4,13 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState,
   ReactNode,
 } from "react";
 import { tokenStore } from "../lib/tokenStore";
-import { getCustomerProfile } from "../services/customer.service";
+import { clearPanelPreference } from "../lib/panelPreference";
+import { getCustomerProfile, UserRole } from "../services/customer.service";
 
 export interface AuthUser {
   NID: string;
@@ -21,8 +23,11 @@ interface AuthContextType {
   isLoggedIn: boolean;
   user: AuthUser | null;
   profilePicture: string | null;
+  userRoles: UserRole[];
+  hasActiveRole: boolean;
+  isAdmin: boolean;
   updateProfilePicture: (url: string | null) => void;
-  login: (token: string, user: AuthUser) => void;
+  login: (token: string, user: AuthUser, userRoles?: UserRole[]) => void;
   logout: () => Promise<void>;
 }
 
@@ -35,6 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
 
   /* Restore persisted picture immediately (sync, client-only) */
   useEffect(() => {
@@ -54,29 +60,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return getCustomerProfile(data.payload.Email).then((profile) => {
             setUser({ NID: profile.NID, Name: profile.Name, Email: profile.Email });
             updateProfilePicture(profile.ProfilePicture ?? null);
+            setUserRoles(profile.UserRoles ?? []);
           });
         } else {
           localStorage.removeItem(PICTURE_KEY);
           setProfilePicture(null);
+          setUserRoles([]);
         }
       })
       .catch(() => {})
       .finally(() => setAuthLoading(false));
   }, []);
 
-  function login(token: string, user: AuthUser) {
+  function login(token: string, user: AuthUser, roles?: UserRole[]) {
     tokenStore.set(token);
     setIsLoggedIn(true);
     setUser(user);
+    setUserRoles(roles ?? []);
   }
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
     tokenStore.clear();
     localStorage.removeItem(PICTURE_KEY);
+    clearPanelPreference();
     setIsLoggedIn(false);
     setUser(null);
     setProfilePicture(null);
+    setUserRoles([]);
     window.location.replace("/");
   }
 
@@ -89,9 +100,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  /* The backend already filters UserRoles by Status='ACTIVE', so any entry
+     here is an active assignment. isAdmin looks at RoleType case-insensitively. */
+  const hasActiveRole = userRoles.length > 0;
+  const isAdmin = useMemo(
+    () =>
+      userRoles.some(
+        (ur) => (ur.Role?.RoleType ?? "").toLowerCase() === "admin"
+      ),
+    [userRoles]
+  );
+
   return (
     <AuthContext.Provider
-      value={{ authLoading, isLoggedIn, user, profilePicture, updateProfilePicture, login, logout }}
+      value={{
+        authLoading,
+        isLoggedIn,
+        user,
+        profilePicture,
+        userRoles,
+        hasActiveRole,
+        isAdmin,
+        updateProfilePicture,
+        login,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

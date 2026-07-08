@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import LoginModal from "../auth/login/LoginModal";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -16,13 +17,22 @@ const hamburgerSpanClasses =
   "block w-full h-0.5 bg-[rgba(255,255,255,0.8)] rounded-sm transition-[transform,opacity] duration-[250ms] origin-center";
 
 export default function Navbar() {
-  const { authLoading, isLoggedIn, user, profilePicture, logout } = useAuth();
+  const { authLoading, isLoggedIn, user, profilePicture, hasActiveRole, isAdmin, logout } = useAuth();
+  const pathname = usePathname() ?? "";
   const [menuOpen, setMenuOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLLIElement>(null);
 
   const userInitial = user?.Name?.charAt(0)?.toUpperCase() ?? "?";
+
+  /* When the user is inside /dashboard/admin, the switch offers going back to
+     the personal panel; otherwise it offers jumping into the admin area. */
+  const isOnAdmin = pathname.startsWith("/dashboard/admin");
+  const panelSwitchHref = isOnAdmin ? "/dashboard/customer" : "/dashboard/admin";
+  const panelSwitchLabel = isOnAdmin
+    ? "Mi panel personal"
+    : `Panel de ${isAdmin ? "administración" : "personal"}`;
 
   useEffect(() => {
     if (!dropdownOpen) return;
@@ -110,6 +120,25 @@ export default function Navbar() {
                         Mi perfil
                       </Link>
 
+                      {hasActiveRole && (
+                        <Link
+                          href={panelSwitchHref}
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-3 px-4 py-[0.6rem] text-[0.875rem] text-white/80 transition-[background,color] duration-150 hover:bg-white/[0.05] hover:text-white"
+                        >
+                          {isOnAdmin ? (
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M3 12l9-9 9 9"/><path d="M5 10v10h14V10"/>
+                            </svg>
+                          ) : (
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>
+                            </svg>
+                          )}
+                          {panelSwitchLabel}
+                        </Link>
+                      )}
+
                       <div className="mx-3 my-1 border-t border-white/[0.07]" />
 
                       <button
@@ -195,6 +224,17 @@ export default function Navbar() {
                     Mi perfil
                   </Link>
                 </li>
+                {hasActiveRole && (
+                  <li>
+                    <Link
+                      href={panelSwitchHref}
+                      className={mobileLinkClasses}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {panelSwitchLabel}
+                    </Link>
+                  </li>
+                )}
                 <li>
                   <button
                     className={`${mobileLinkClasses} !text-[rgba(255,100,100,0.7)] hover:!text-[#ef5350] hover:!bg-[rgba(229,57,53,0.06)]`}

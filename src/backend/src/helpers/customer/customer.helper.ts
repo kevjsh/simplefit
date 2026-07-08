@@ -1,8 +1,11 @@
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import { ICustomer, ISignupData } from "../../interfaces/customer.interface";
+import { IUserRole } from "../../interfaces/roles/user.role.interface";
 import { CustomerCredentials } from "../../models/customers/customer.credential.model";
 import { Customers } from "../../models/customers/customer.model";
+import { UserRoles } from "../../models/roles/user.role.model";
+import { Roles } from "../../models/roles/role.model";
 import { createCustomerCredentials } from "./customer.credential.helper";
 import { newCustomerMail } from "../emails/customer.email";
 
@@ -88,6 +91,27 @@ export async function checkPassword(customer: ICustomer, password: string): Prom
 
     await Customers.update({ LastLogin: new Date() }, { where: { Id: customer.Id } });
     return true;
+}
+
+/**
+ * Returns all roles currently assigned to a customer with Status='ACTIVE',
+ * including the underlying Role description. Used to gate admin-only areas.
+ */
+export async function getCustomerActiveRoles(customerId: string): Promise<IUserRole[]> {
+    const rows = await UserRoles.findAll({
+        where: { CustomerId: customerId, Status: 'ACTIVE' },
+        include: [{
+            model: Roles,
+            as: 'Role',
+            attributes: ['Id', 'RoleType', 'Description'],
+        }],
+        order: [['AssignedAt', 'DESC']],
+    });
+
+    return rows.map((r) => {
+        const plain: any = (r as any).get ? (r as any).get({ plain: true }) : r;
+        return plain as IUserRole;
+    });
 }
 
 export async function updateCustomerProfilePicture(email: string, profilePictureUrl: string): Promise<void> {

@@ -25,8 +25,15 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if ((pathname === "/" || pathname === "/signup") && isValid) {
-    return NextResponse.redirect(new URL("/dashboard/customer", request.url));
+  /* /signup should never be shown to authenticated users. We bounce them to
+     the site root so the client-side smart redirect (see app/page.tsx) can
+     pick the correct panel based on active roles + last-visited preference.
+     We deliberately do NOT redirect "/" here — it needs the client to read
+     localStorage and the user's roles, neither of which are available in
+     middleware. app/page.tsx handles that transition without ever showing
+     the marketing content. */
+  if (pathname === "/signup" && isValid) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../../context/AuthContext";
+import { writePanelPreference } from "../../../../lib/panelPreference";
 import Navbar from "../../navbar/Navbar";
 import Footer from "../../footer/Footer";
 import ChangePasswordModal from "../../auth/security/ChangePasswordModal";
@@ -17,6 +18,11 @@ export default function CustomerDashboard() {
     const tempPass = sessionStorage.getItem("isTempPassword") === "true";
     setIsTempPassword(tempPass);
     if (tempPass) setChangePassOpen(true);
+  }, []);
+
+  /* Remember this panel so the site root sends the user here next time */
+  useEffect(() => {
+    writePanelPreference("customer");
   }, []);
 
   /* Redirect to home once we know the user is not authenticated */

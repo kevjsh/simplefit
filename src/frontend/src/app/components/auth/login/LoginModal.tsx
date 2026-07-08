@@ -8,6 +8,7 @@ import { loginCustomer } from "../../../../services/auth.service";
 import { getCustomerProfile } from "../../../../services/customer.service";
 import { useNotifications } from "../../utils/NotificationSystem";
 import { useAuth } from "../../../../context/AuthContext";
+import { resolveDashboardPath } from "../../../../lib/panelPreference";
 import RecoveryPasswordModal from "../security/RecoveryPasswordModal";
 
 interface LoginModalProps {
@@ -46,12 +47,19 @@ export default function LoginModal({ open, onClose }: LoginModalProps) {
 
       /* Fetch profile from the API — single source of truth for display data */
       const profile = await getCustomerProfile(email);
-      login(data.token, { NID: profile.NID, Name: profile.Name, Email: profile.Email });
+      const roles = profile.UserRoles ?? [];
+      login(
+        data.token,
+        { NID: profile.NID, Name: profile.Name, Email: profile.Email },
+        roles
+      );
       updateProfilePicture(profile.ProfilePicture ?? null);
 
       sessionStorage.setItem("isTempPassword", data.isTempPassword ? "true" : "false");
       onClose();
-      router.push("/dashboard/customer");
+      /* Route to whichever panel the user last opened (defaults to admin
+         when they have an active role and no prior preference). */
+      router.push(resolveDashboardPath(roles.length > 0));
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data?.message
