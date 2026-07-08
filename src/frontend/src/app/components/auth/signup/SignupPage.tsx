@@ -503,9 +503,11 @@ export default function SignupPage() {
                       <input
                         id="sf-phoneSecondary"
                         type="tel"
+                        inputMode="numeric"
                         className={inputBase}
                         placeholder="Opcional"
                         value={form.phoneSecondary}
+                        maxLength={8}
                         onChange={set("phoneSecondary")}
                         autoComplete="tel"
                       />

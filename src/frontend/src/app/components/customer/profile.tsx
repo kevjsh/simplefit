@@ -372,15 +372,20 @@ export default function ProfilePage() {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-7">
 
                   {/* Avatar with camera button */}
-                  <div className="shrink-0 relative self-start sm:self-auto">
+                  <div className="shrink-0 relative self-start sm:self-auto group">
+                    {/* Attention-grabbing red ring — hints the avatar is interactive */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 rounded-full border-2 border-[#c62828] animate-avatar-ring transition-opacity duration-200 group-hover:opacity-0"
+                    />
                     <button
                       type="button"
                       onClick={openLightbox}
                       disabled={!hasPhoto}
-                      className={`block w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border transition-[border-color,opacity] duration-150 ${
+                      className={`relative block w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-[#c62828] shadow-[0_6px_22px_rgba(198,40,40,0.28)] transition-[transform,border-color,box-shadow] duration-200 ${
                         hasPhoto
-                          ? "border-[#c62828]/25 hover:border-[#c62828]/50 cursor-zoom-in"
-                          : "border-[#c62828]/20 cursor-default"
+                          ? "hover:border-[#ef5350] hover:scale-[1.04] hover:shadow-[0_8px_28px_rgba(198,40,40,0.42)] cursor-zoom-in"
+                          : "cursor-default"
                       }`}
                     >
                       {profile?.ProfilePicture ? (
@@ -395,7 +400,8 @@ export default function ProfilePage() {
                       type="button"
                       onClick={openUploadModal}
                       title="Cambiar foto de perfil"
-                      className="absolute bottom-0 right-0 w-[22px] h-[22px] sm:w-[26px] sm:h-[26px] rounded-full bg-[#c62828] border-2 border-[#0d1317] flex items-center justify-center text-white cursor-pointer transition-[background] duration-150 hover:bg-[#b71c1c]"
+                      aria-label="Cambiar foto de perfil"
+                      className="absolute -bottom-0.5 -right-0.5 w-[24px] h-[24px] sm:w-[28px] sm:h-[28px] rounded-full bg-[#c62828] border-2 border-[#0d1317] flex items-center justify-center text-white cursor-pointer transition-[background,transform] duration-150 hover:bg-[#b71c1c] hover:scale-110 animate-camera-glow"
                     >
                       <IconCamera />
                     </button>

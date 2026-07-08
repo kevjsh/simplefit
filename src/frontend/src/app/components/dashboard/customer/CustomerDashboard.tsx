@@ -72,6 +72,24 @@ export default function CustomerDashboard() {
             </p>
           </div>
 
+          {/* Profile shortcut */}
+          <div className="w-full flex flex-col items-center gap-3">
+            <button
+              type="button"
+              onClick={() => router.push("/profile")}
+              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-[10px] bg-white text-[#0f1519] text-[0.9rem] font-semibold tracking-[-0.005em] hover:bg-white/90 active:scale-[0.99] transition-all shadow-[0_1px_2px_rgba(0,0,0,0.25)]"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              Actualizar mis datos de perfil
+            </button>
+            <p className="text-[0.78rem] text-white/35 leading-[1.5]">
+              Cambia tu foto e información personal.
+            </p>
+          </div>
+
         </div>
       </main>
 
