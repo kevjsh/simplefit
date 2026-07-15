@@ -55,6 +55,31 @@ export async function getCustomerByNID(nid: string): Promise<ICustomer | null> {
     return await Customers.findOne({ where: { NID: nid } });
 }
 
+/**
+ * Returns a page of Customers sorted by the requested column, along with the
+ * total count of records for pagination metadata. Sorting by `Name` also
+ * breaks ties by last names, so the roster reads as truly alphabetical
+ * instead of just grouping first names.
+ */
+export async function getCustomersPaginated(
+    limit: number,
+    offset: number,
+    sortBy: string,
+    sortOrder: 'ASC' | 'DESC'
+): Promise<{ rows: ICustomer[]; count: number }> {
+    const order = sortBy === 'Name'
+        ? [['Name', sortOrder], ['FirstLastName', sortOrder], ['SecondLastName', sortOrder]]
+        : [[sortBy, sortOrder]];
+
+    const { rows, count } = await Customers.findAndCountAll({
+        limit,
+        offset,
+        order: order as any,
+    });
+
+    return { rows, count };
+}
+
 export async function getCustomerProfile(email: string): Promise<Omit<ICustomer, 'UserRoles'> | null> {
 
     return await Customers.findOne({

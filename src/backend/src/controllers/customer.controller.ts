@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import axios from "axios";
-import { getCustomerByNID, getCustomerProfile, getCustomerActiveRoles, updateCustomerProfilePicture } from "../helpers/customer/customer.helper";
+import { getCustomerByNID, getCustomerProfile, getCustomerActiveRoles, getCustomersPaginated, updateCustomerProfilePicture } from "../helpers/customer/customer.helper";
 import { firebaseStorageHelper } from "../helpers/firebaseStorage.helper";
 import { logger } from "../helpers/logger.helper";
+import { getPaginationParams, buildPaginatedResult, getSortParams } from "../helpers/utils";
 import { Customers } from "../models/customers/customer.model";
 
 function toTitleCase(str: string): string {
@@ -35,6 +36,19 @@ export const lookupByNID = async (req: Request, res: Response): Promise<void> =>
     res.status(200).json({ nid, name });
   } catch (error) {
     logger.error(`NID lookup error. ${error}`);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const getCustomers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const params = getPaginationParams(req);
+    const { sortBy, sortOrder } = getSortParams(req, ["Name", "RegistrationDate"], "Name", "ASC");
+    const { rows, count } = await getCustomersPaginated(params.limit, params.offset, sortBy, sortOrder);
+
+    res.status(200).json(buildPaginatedResult(rows, count, params));
+  } catch (error) {
+    logger.error(`Get customers error. ${error}`);
     res.status(500).json({ message: "Internal server error." });
   }
 };

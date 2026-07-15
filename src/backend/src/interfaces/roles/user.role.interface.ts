@@ -4,7 +4,7 @@ export interface IUserRole {
   Id: string;
   CustomerId: string;
   RoleId: string;
-  GymId: number;
+  BranchId: string;
   AssignedBy: string;
   AssignedAt: Date;
   Status: string;

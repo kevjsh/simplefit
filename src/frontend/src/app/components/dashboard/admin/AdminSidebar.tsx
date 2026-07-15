@@ -28,6 +28,45 @@ const NAV_ITEMS: NavItem[] = [
       </svg>
     ),
   },
+  {
+    key: "usuarios",
+    label: "Usuarios",
+    href: "/dashboard/admin/usuarios",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    ),
+  },
+  {
+    key: "gimnasios",
+    label: "Gimnasios",
+    href: "/dashboard/admin/gimnasios",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6.5 6.5l11 11" />
+        <path d="M21 21l-1-1" />
+        <path d="M3 3l1 1" />
+        <path d="M18 22l4-4" />
+        <path d="M2 6l4-4" />
+        <path d="M3 10l7-7" />
+        <path d="M14 21l7-7" />
+      </svg>
+    ),
+  },
+  {
+    key: "seguridad",
+    label: "Seguridad",
+    href: "/dashboard/admin/seguridad",
+    icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
+    ),
+  },
   /* Future modules go here (clientes, membresías, planes, reportes, ...) */
 ];
 

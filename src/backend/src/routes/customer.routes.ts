@@ -3,10 +3,17 @@ import multer from "multer";
 import { param } from "express-validator";
 import { validation } from "../middlewares/validation";
 import { validateToken } from "../helpers/jwtValidator";
-import { lookupByNID, getProfileByEmail, uploadProfilePicture, updateProfile } from "../controllers/customer.controller";
+import { authorizePermission } from "../middlewares/authorize";
+import { lookupByNID, getCustomers, getProfileByEmail, uploadProfilePicture, updateProfile } from "../controllers/customer.controller";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
+
+router.route("/api/customers").get(
+  validateToken,
+  authorizePermission(["customers.read"]),
+  getCustomers,
+);
 
 router.route("/api/customer/lookup/:nid").get([
   param("nid", "NID is required and must not be empty.")

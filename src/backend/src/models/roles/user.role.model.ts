@@ -22,9 +22,9 @@ export const UserRoles = sequelize.define<IUserRoleInstance>('UserRoles', {
     type: DataTypes.CHAR(36),
     allowNull: false,
   },
-  GymId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
+  BranchId: {
+    type: DataTypes.CHAR(36),
+    allowNull: true,
   },
   AssignedBy: {
     type: DataTypes.CHAR(36),
