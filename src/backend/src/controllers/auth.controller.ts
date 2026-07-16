@@ -20,6 +20,15 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     if (!await checkPassword(customer, password)) throw new Error('Email or password is incorrect.');
 
+    if (String(customer.Status ?? '').toUpperCase() !== 'ACTIVE') {
+      logger.warn(`Login blocked — inactive account. Email=${email}`);
+      res.status(403).json({
+        code: 'ACCOUNT_INACTIVE',
+        message: 'Tu cuenta ha sido inactivada. Contacta a soporte para más información.',
+      });
+      return;
+    }
+
     const token = await generateToken(customer);
     const refreshToken = await generateRefreshToken(customer);
 

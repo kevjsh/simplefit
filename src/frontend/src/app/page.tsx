@@ -7,19 +7,25 @@ import Footer from "./components/footer/Footer";
 import LoginModal from "./components/auth/login/LoginModal";
 import { useAuth } from "../context/AuthContext";
 import { resolveDashboardPath } from "../lib/panelPreference";
+import { ACCOUNT_INACTIVE_PATH } from "../lib/accountStatus";
 
 export default function Home() {
   const [loginOpen, setLoginOpen] = useState(false);
   const router = useRouter();
-  const { authLoading, isLoggedIn, hasActiveRole } = useAuth();
+  const { authLoading, isLoggedIn, isInactive, hasActiveRole } = useAuth();
 
   /* Authenticated users don't belong on the marketing landing:
-     · No active role      → always /dashboard/customer
+     · Inactive account   → /inactive
+     · No active role     → always /dashboard/customer
      · Active role present → last selected panel (default "admin") */
   useEffect(() => {
     if (authLoading || !isLoggedIn) return;
+    if (isInactive) {
+      router.replace(ACCOUNT_INACTIVE_PATH);
+      return;
+    }
     router.replace(resolveDashboardPath(hasActiveRole));
-  }, [authLoading, isLoggedIn, hasActiveRole, router]);
+  }, [authLoading, isLoggedIn, isInactive, hasActiveRole, router]);
 
   /* Hide the marketing content while auth is loading or while a redirect
      is imminent — prevents a flash of the landing for logged-in users. */

@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import axios from "axios";
-import { getCustomerByNID, getCustomerProfile, getCustomerActiveRoles, getCustomersPaginated, updateCustomerProfilePicture } from "../helpers/customer/customer.helper";
+import { getCustomerByNID, getCustomerProfile, getCustomerActiveRoles, getCustomersPaginated, updateCustomerProfilePicture, updateCustomerStatus, updateCustomerDetails } from "../helpers/customer/customer.helper";
 import { firebaseStorageHelper } from "../helpers/firebaseStorage.helper";
 import { logger } from "../helpers/logger.helper";
-import { getPaginationParams, buildPaginatedResult, getSortParams } from "../helpers/utils";
+import { getPaginationParams, buildPaginatedResult, getSortParams, getSearchQuery } from "../helpers/utils";
 import { Customers } from "../models/customers/customer.model";
 
 function toTitleCase(str: string): string {
@@ -44,11 +44,73 @@ export const getCustomers = async (req: Request, res: Response): Promise<void> =
   try {
     const params = getPaginationParams(req);
     const { sortBy, sortOrder } = getSortParams(req, ["Name", "RegistrationDate"], "Name", "ASC");
-    const { rows, count } = await getCustomersPaginated(params.limit, params.offset, sortBy, sortOrder);
+    const search = getSearchQuery(req);
+    const { rows, count } = await getCustomersPaginated(params.limit, params.offset, sortBy, sortOrder, search);
 
     res.status(200).json(buildPaginatedResult(rows, count, params));
   } catch (error) {
     logger.error(`Get customers error. ${error}`);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const updateStatus = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  const { status } = req.body as { status?: string };
+
+  try {
+    const normalized = String(status ?? "").trim().toUpperCase();
+    if (normalized !== "ACTIVE" && normalized !== "INACTIVE") {
+      res.status(400).json({ message: "Status must be ACTIVE or INACTIVE." });
+      return;
+    }
+
+    const customer = await updateCustomerStatus(id, normalized);
+    if (!customer) {
+      res.status(404).json({ message: "Customer not found." });
+      return;
+    }
+
+    logger.info(`Customer status updated. Id=${id} Status=${normalized}`);
+    res.status(200).json({
+      message: "Estado actualizado exitosamente.",
+      customerId: id,
+      status: normalized,
+    });
+  } catch (error) {
+    logger.error(`Update customer status error. ${error}`);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const updateDetails = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  const { details } = req.body as { details?: string | null };
+
+  try {
+    if (details !== null && details !== undefined && typeof details !== "string") {
+      res.status(400).json({ message: "Details must be a string or null." });
+      return;
+    }
+
+    const normalized = details === undefined || details === null
+      ? null
+      : String(details).trim() || null;
+
+    const customer = await updateCustomerDetails(id, normalized);
+    if (!customer) {
+      res.status(404).json({ message: "Customer not found." });
+      return;
+    }
+
+    logger.info(`Customer details updated. Id=${id}`);
+    res.status(200).json({
+      message: "Descripción actualizada exitosamente.",
+      customerId: id,
+      details: normalized,
+    });
+  } catch (error) {
+    logger.error(`Update customer details error. ${error}`);
     res.status(500).json({ message: "Internal server error." });
   }
 };

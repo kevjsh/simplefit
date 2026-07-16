@@ -10,6 +10,7 @@ import {
 } from "react";
 import { tokenStore } from "../lib/tokenStore";
 import { clearPanelPreference } from "../lib/panelPreference";
+import { clearAccountInactiveLock, isAccountActive } from "../lib/accountStatus";
 import { getCustomerProfile, UserRole } from "../services/customer.service";
 
 export interface AuthUser {
@@ -21,13 +22,14 @@ export interface AuthUser {
 interface AuthContextType {
   authLoading: boolean;
   isLoggedIn: boolean;
+  isInactive: boolean;
   user: AuthUser | null;
   profilePicture: string | null;
   userRoles: UserRole[];
   hasActiveRole: boolean;
   isAdmin: boolean;
   updateProfilePicture: (url: string | null) => void;
-  login: (token: string, user: AuthUser, userRoles?: UserRole[]) => void;
+  login: (token: string, user: AuthUser, userRoles?: UserRole[], accountStatus?: string | null) => void;
   logout: () => Promise<void>;
 }
 
@@ -38,6 +40,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [authLoading, setAuthLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isInactive, setIsInactive] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
@@ -60,23 +63,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return getCustomerProfile(data.payload.Email).then((profile) => {
             setUser({ NID: profile.NID, Name: profile.Name, Email: profile.Email });
             updateProfilePicture(profile.ProfilePicture ?? null);
-            setUserRoles(profile.UserRoles ?? []);
+            const inactive = !isAccountActive(profile.Status);
+            setIsInactive(inactive);
+            setUserRoles(inactive ? [] : (profile.UserRoles ?? []));
           });
         } else {
           localStorage.removeItem(PICTURE_KEY);
           setProfilePicture(null);
           setUserRoles([]);
+          setIsInactive(false);
         }
       })
       .catch(() => {})
       .finally(() => setAuthLoading(false));
   }, []);
 
-  function login(token: string, user: AuthUser, roles?: UserRole[]) {
+  function login(
+    token: string,
+    nextUser: AuthUser,
+    roles?: UserRole[],
+    accountStatus?: string | null
+  ) {
     tokenStore.set(token);
     setIsLoggedIn(true);
-    setUser(user);
-    setUserRoles(roles ?? []);
+    setUser(nextUser);
+    const inactive = accountStatus !== undefined && accountStatus !== null
+      ? !isAccountActive(accountStatus)
+      : false;
+    setIsInactive(inactive);
+    setUserRoles(inactive ? [] : (roles ?? []));
+    if (!inactive) clearAccountInactiveLock();
   }
 
   async function logout() {
@@ -84,7 +100,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     tokenStore.clear();
     localStorage.removeItem(PICTURE_KEY);
     clearPanelPreference();
+    clearAccountInactiveLock();
     setIsLoggedIn(false);
+    setIsInactive(false);
     setUser(null);
     setProfilePicture(null);
     setUserRoles([]);
@@ -116,6 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         authLoading,
         isLoggedIn,
+        isInactive,
         user,
         profilePicture,
         userRoles,

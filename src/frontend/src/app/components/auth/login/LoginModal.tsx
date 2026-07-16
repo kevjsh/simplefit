@@ -9,6 +9,7 @@ import { getCustomerProfile } from "../../../../services/customer.service";
 import { useNotifications } from "../../utils/NotificationSystem";
 import { useAuth } from "../../../../context/AuthContext";
 import { resolveDashboardPath } from "../../../../lib/panelPreference";
+import { ACCOUNT_INACTIVE_PATH, setAccountInactiveLock } from "../../../../lib/accountStatus";
 import RecoveryPasswordModal from "../security/RecoveryPasswordModal";
 
 interface LoginModalProps {
@@ -51,7 +52,8 @@ export default function LoginModal({ open, onClose }: LoginModalProps) {
       login(
         data.token,
         { NID: profile.NID, Name: profile.Name, Email: profile.Email },
-        roles
+        roles,
+        profile.Status
       );
       updateProfilePicture(profile.ProfilePicture ?? null);
 
@@ -61,8 +63,15 @@ export default function LoginModal({ open, onClose }: LoginModalProps) {
          when they have an active role and no prior preference). */
       router.push(resolveDashboardPath(roles.length > 0));
     } catch (err: unknown) {
+      const responseData = (err as { response?: { data?: { code?: string; message?: string } } })?.response?.data;
+      if (responseData?.code === "ACCOUNT_INACTIVE") {
+        setAccountInactiveLock();
+        onClose();
+        router.push(ACCOUNT_INACTIVE_PATH);
+        return;
+      }
       const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+        responseData?.message
         ?? "Correo electrónico o contraseña incorrectos.";
       notify.error(message);
     } finally {

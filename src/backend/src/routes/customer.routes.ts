@@ -1,10 +1,10 @@
 import express from "express";
 import multer from "multer";
-import { param } from "express-validator";
+import { body, param } from "express-validator";
 import { validation } from "../middlewares/validation";
 import { validateToken } from "../helpers/jwtValidator";
 import { authorizePermission } from "../middlewares/authorize";
-import { lookupByNID, getCustomers, getProfileByEmail, uploadProfilePicture, updateProfile } from "../controllers/customer.controller";
+import { lookupByNID, getCustomers, updateStatus, updateDetails, getProfileByEmail, uploadProfilePicture, updateProfile } from "../controllers/customer.controller";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -14,6 +14,31 @@ router.route("/api/customers").get(
   authorizePermission(["customers.read"]),
   getCustomers,
 );
+
+router.route("/api/customers/:id/status").patch([
+  param("id", "Customer id is required.").notEmpty().isString(),
+  body("status", "Status is required.")
+    .notEmpty()
+    .isString()
+    .custom((value) => {
+      const normalized = String(value).trim().toUpperCase();
+      if (normalized !== "ACTIVE" && normalized !== "INACTIVE") {
+        throw new Error("Status must be ACTIVE or INACTIVE.");
+      }
+      return true;
+    }),
+  validation,
+  validateToken,
+  authorizePermission(["customers.update"]),
+], updateStatus);
+
+router.route("/api/customers/:id/details").patch([
+  param("id", "Customer id is required.").notEmpty().isString(),
+  body("details").optional({ nullable: true }).isString(),
+  validation,
+  validateToken,
+  authorizePermission(["customers.update"]),
+], updateDetails);
 
 router.route("/api/customer/lookup/:nid").get([
   param("nid", "NID is required and must not be empty.")

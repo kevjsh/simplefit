@@ -74,3 +74,15 @@ export function getSortParams(
 
   return { sortBy, sortOrder };
 }
+
+/**
+ * Reads an optional `search` query string and trims it. Returns `null` when
+ * empty so callers can skip applying a filter.
+ */
+export function getSearchQuery(req: Request, paramName = "search"): string | null {
+  const raw = req.query[paramName];
+  if (raw === undefined || raw === null) return null;
+
+  const value = String(Array.isArray(raw) ? raw[0] : raw).trim();
+  return value.length > 0 ? value : null;
+}

@@ -20,10 +20,56 @@ export async function getCustomers(
   page = 1,
   limit = 10,
   sortBy: CustomersSortField = "Name",
-  sortOrder: SortOrder = "ASC"
+  sortOrder: SortOrder = "ASC",
+  search = ""
 ): Promise<PaginatedCustomers> {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    sortBy,
+    sortOrder,
+  });
+  const trimmed = search.trim();
+  if (trimmed) params.set("search", trimmed);
+
   return apiRequest<PaginatedCustomers>({
     method: "GET",
-    url: `/api/customers?page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`,
+    url: `/api/customers?${params.toString()}`,
+  });
+}
+
+export type CustomerStatus = "ACTIVE" | "INACTIVE";
+
+export interface UpdateCustomerStatusResponse {
+  message: string;
+  customerId: string;
+  status: CustomerStatus;
+}
+
+export async function updateCustomerStatus(
+  customerId: string,
+  status: CustomerStatus
+): Promise<UpdateCustomerStatusResponse> {
+  return apiRequest<UpdateCustomerStatusResponse>({
+    method: "PATCH",
+    url: `/api/customers/${customerId}/status`,
+    body: { status },
+  });
+}
+
+export interface UpdateCustomerDetailsResponse {
+  message: string;
+  customerId: string;
+  details: string | null;
+}
+
+export async function updateCustomerDetails(
+  customerId: string,
+  details: string | null
+): Promise<UpdateCustomerDetailsResponse> {
+  return apiRequest<UpdateCustomerDetailsResponse>({
+    method: "PATCH",
+    url: `/api/customers/${customerId}/details`,
+    body: { details },
   });
 }

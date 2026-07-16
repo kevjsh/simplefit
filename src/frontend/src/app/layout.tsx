@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { NotificationProvider } from "./components/utils/NotificationSystem";
 import { AuthProvider } from "../context/AuthContext";
+import AccountStatusGate from "./components/auth/AccountStatusGate";
 
 export const metadata: Metadata = {
   title: "SimpleFit",
@@ -21,7 +22,9 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <NotificationProvider>
-            {children}
+            <AccountStatusGate>
+              {children}
+            </AccountStatusGate>
           </NotificationProvider>
         </AuthProvider>
       </body>

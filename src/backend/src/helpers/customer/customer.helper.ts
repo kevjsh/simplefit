@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
+import { Op, WhereOptions } from 'sequelize';
 import { ICustomer, ISignupData } from "../../interfaces/customer.interface";
 import { IUserRole } from "../../interfaces/roles/user.role.interface";
 import { CustomerCredentials } from "../../models/customers/customer.credential.model";
@@ -55,23 +56,46 @@ export async function getCustomerByNID(nid: string): Promise<ICustomer | null> {
     return await Customers.findOne({ where: { NID: nid } });
 }
 
+function escapeLike(value: string): string {
+    return value.replace(/[%_\\]/g, '\\$&');
+}
+
 /**
  * Returns a page of Customers sorted by the requested column, along with the
  * total count of records for pagination metadata. Sorting by `Name` also
  * breaks ties by last names, so the roster reads as truly alphabetical
  * instead of just grouping first names.
+ *
+ * When `search` is provided, matches NID, Name, FirstLastName, SecondLastName
+ * or Email (case-insensitive partial match).
  */
 export async function getCustomersPaginated(
     limit: number,
     offset: number,
     sortBy: string,
-    sortOrder: 'ASC' | 'DESC'
+    sortOrder: 'ASC' | 'DESC',
+    search: string | null = null
 ): Promise<{ rows: ICustomer[]; count: number }> {
     const order = sortBy === 'Name'
         ? [['Name', sortOrder], ['FirstLastName', sortOrder], ['SecondLastName', sortOrder]]
         : [[sortBy, sortOrder]];
 
+    let where: WhereOptions | undefined;
+    if (search) {
+        const pattern = `%${escapeLike(search)}%`;
+        where = {
+            [Op.or]: [
+                { NID: { [Op.like]: pattern } },
+                { Name: { [Op.like]: pattern } },
+                { FirstLastName: { [Op.like]: pattern } },
+                { SecondLastName: { [Op.like]: pattern } },
+                { Email: { [Op.like]: pattern } },
+            ],
+        };
+    }
+
     const { rows, count } = await Customers.findAndCountAll({
+        where,
         limit,
         offset,
         order: order as any,
@@ -148,4 +172,20 @@ export async function updateCustomerProfilePicture(email: string, profilePicture
     } catch (error) {
         throw new Error(`Failed to update profile picture: ${error}`);
     }
+}
+
+export async function updateCustomerStatus(customerId: string, status: string): Promise<ICustomer | null> {
+    const customer = await Customers.findByPk(customerId);
+    if (!customer) return null;
+
+    await customer.update({ Status: status });
+    return customer;
+}
+
+export async function updateCustomerDetails(customerId: string, details: string | null): Promise<ICustomer | null> {
+    const customer = await Customers.findByPk(customerId);
+    if (!customer) return null;
+
+    await customer.update({ Details: details } as any);
+    return customer;
 }
