@@ -211,7 +211,15 @@ export default function UserRowMenu({
         style={{ left: anchor.x, top: anchor.y }}
       >
         {/* Header with photo */}
-        <div className="px-4 py-4 border-b border-white/[0.07] flex items-center gap-3">
+        <div className="relative px-4 py-4 border-b border-white/[0.07] flex items-center gap-3 pr-10">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar"
+            className="absolute top-2.5 right-2.5 w-7 h-7 flex items-center justify-center rounded-md text-white/35 hover:text-white/75 hover:bg-white/[0.06] transition-colors"
+          >
+            <IconClose />
+          </button>
           {hasPhoto ? (
             <button
               type="button"

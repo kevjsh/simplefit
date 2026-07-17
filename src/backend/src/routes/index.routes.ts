@@ -8,5 +8,6 @@ router.get("/", (_req, res) => {
 
 router.use(require("./auth.routes"));
 router.use(require("./customer.routes"));
+router.use(require("./security"));
 
 export default router;
